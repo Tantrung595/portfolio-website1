@@ -327,6 +327,9 @@ langToggle.addEventListener('click', () => {
     const val = lang === 'en' ? el.dataset.en : el.dataset.kr;
     if (val !== undefined) el.innerHTML = val;
   });
+  document.querySelectorAll('[data-ph-en]').forEach(el => {
+    el.placeholder = lang === 'en' ? el.dataset.phEn : el.dataset.phKr;
+  });
 
   // Re-trigger typed animation with new language
   startTyped();

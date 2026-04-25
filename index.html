@@ -797,13 +797,13 @@
           </p>
           <form class="contact-form" id="contactForm" novalidate>
             <div class="cf-field">
-              <input type="text" id="cfName" placeholder="Full Name *" autocomplete="name">
+              <input type="text" id="cfName" placeholder="Full Name *" data-ph-en="Full Name *" data-ph-kr="이름 *" autocomplete="name">
             </div>
             <div class="cf-field">
-              <input type="email" id="cfEmail" placeholder="Email Address *" autocomplete="email">
+              <input type="email" id="cfEmail" placeholder="Email Address *" data-ph-en="Email Address *" data-ph-kr="이메일 주소 *" autocomplete="email">
             </div>
             <div class="cf-field">
-              <textarea id="cfMsg" rows="3" placeholder="Your message…"></textarea>
+              <textarea id="cfMsg" rows="3" placeholder="Your message…" data-ph-en="Your message…" data-ph-kr="메시지를 입력하세요…"></textarea>
             </div>
             <button type="submit" class="cf-submit" id="cfSubmit">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
@@ -1156,6 +1156,6 @@
       if (cfg) window._sb = window.supabase.createClient(cfg.url, cfg.key);
     })();
   </script>
-  <script src="js/script.js?v=36"></script>
+  <script src="js/script.js?v=37"></script>
 </body>
 </html>
