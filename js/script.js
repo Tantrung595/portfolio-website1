@@ -2512,13 +2512,27 @@ var SectionAdmin = (function () {
     else loadTrack(idx, true);
   });
 
-  window.addEventListener('load', function() {
-    loadPlaylist();
+  function tryAutoplay() {
     if (!playlist.length) return;
     loadTrack(0, false);
-    audio.muted  = true;
+    audio.muted  = false;
     audio.volume = 0.45;
-    audio.play().then(function() { setUI(true); }).catch(function() {});
+    audio.play().then(function() {
+      setUI(true);
+      unmuted = true;
+      document.removeEventListener('click',   unmute);
+      document.removeEventListener('scroll',  unmute);
+      document.removeEventListener('keydown', unmute);
+    }).catch(function() {
+      audio.muted  = true;
+      audio.volume = 0.45;
+      audio.play().then(function() { setUI(true); }).catch(function() {});
+    });
+  }
+
+  window.addEventListener('load', function() {
+    loadPlaylist();
+    tryAutoplay();
   });
 
   function unmute() {
@@ -2636,12 +2650,7 @@ var SectionAdmin = (function () {
       var wasEmpty = !playlist.length;
       loadPlaylist();
       if (titleEl && playlist[0]) titleEl.textContent = playlist[0].name || playlist[0].file;
-      if (wasEmpty && playlist.length && audio.paused) {
-        loadTrack(0, false);
-        audio.muted  = true;
-        audio.volume = 0.45;
-        audio.play().then(function() { setUI(true); }).catch(function() {});
-      }
+      if (wasEmpty && playlist.length && audio.paused) tryAutoplay();
     }
   };
 })();
