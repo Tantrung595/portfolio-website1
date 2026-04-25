@@ -2630,6 +2630,20 @@ var SectionAdmin = (function () {
 
   loadPlaylist();
   if (titleEl && playlist[0]) titleEl.textContent = playlist[0].name || playlist[0].file;
+
+  window.MusicPlayer = {
+    refresh: function() {
+      var wasEmpty = !playlist.length;
+      loadPlaylist();
+      if (titleEl && playlist[0]) titleEl.textContent = playlist[0].name || playlist[0].file;
+      if (wasEmpty && playlist.length && audio.paused) {
+        loadTrack(0, false);
+        audio.muted  = true;
+        audio.volume = 0.45;
+        audio.play().then(function() { setUI(true); }).catch(function() {});
+      }
+    }
+  };
 })();
 
 /* ============================================
