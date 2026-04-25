@@ -2123,10 +2123,24 @@ var SectionAdmin = (function () {
     var container = document.getElementById(cfg.cId);
     if (!container) return;
     container.querySelectorAll('[data-sid]').forEach(function(el) { el.remove(); });
+    var savedKr = {};
     if ((allData[sec] || []).length > 0) {
-      container.querySelectorAll('[data-static-id]').forEach(function(el) { el.remove(); });
+      container.querySelectorAll('[data-static-id]').forEach(function(staticEl) {
+        var sid = staticEl.dataset.staticId;
+        var krLines = [];
+        staticEl.querySelectorAll('li[data-kr]').forEach(function(li) { krLines.push(li.dataset.kr || ''); });
+        var h3 = staticEl.querySelector('h3[data-kr]');
+        savedKr[sid] = { lines: krLines, title: h3 ? h3.dataset.kr : '' };
+        staticEl.remove();
+      });
     }
     (allData[sec] || []).forEach(function(item) {
+      if (sec === 'exp' && savedKr[item.id] && !item.desc_kr && savedKr[item.id].lines.length) {
+        item = Object.assign({}, item, {
+          desc_kr: savedKr[item.id].lines.join('\n'),
+          title_kr: item.title_kr || savedKr[item.id].title || item.title
+        });
+      }
       var el = null;
       if      (sec === 'about')     el = createAboutCard(item);
       else if (sec === 'edu')       el = createEduItem(item);
