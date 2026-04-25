@@ -2027,14 +2027,24 @@ var SectionAdmin = (function () {
   function createExpCard(item) {
     var div = document.createElement('div');
     div.className = 'exp-card reveal'; div.dataset.sid = item.id;
-    var lines = (item.desc||'').split('\n').filter(function(l){ return l.trim(); });
-    var listH = lines.map(function(l){ return '<li>'+escH(l)+'</li>'; }).join('');
+    var curLang = (typeof lang !== 'undefined') ? lang : 'en';
+    var lines   = (item.desc||'').split('\n').filter(function(l){ return l.trim(); });
+    var linesKr = item.desc_kr ? item.desc_kr.split('\n').filter(function(l){ return l.trim(); }) : [];
+    var listH = lines.map(function(l, i) {
+      var kr = linesKr[i] || '';
+      var display = (kr && curLang === 'kr') ? kr : l;
+      var krAttr  = kr ? ' data-kr="'+escH(kr)+'"' : '';
+      return '<li data-en="'+escH(l)+'"'+krAttr+'>'+escH(display)+'</li>';
+    }).join('');
+    var titleEn = item.title || '';
+    var titleKr = item.title_kr || titleEn;
+    var titleDisplay = (curLang === 'kr') ? titleKr : titleEn;
     var tags  = (item.tags||'').split(',').filter(function(t){ return t.trim(); });
     var tagsH = tags.map(function(t){ return '<span>'+escH(t.trim())+'</span>'; }).join('');
     div.innerHTML =
       '<div class="exp-card-top"><div class="exp-icon">'+escH(item.icon||'💼')+'</div>'+
       '<span class="exp-tag">'+escH(item.period||'')+'</span></div>'+
-      '<h3>'+escH(item.title||'')+'</h3>'+
+      '<h3 data-en="'+escH(titleEn)+'" data-kr="'+escH(titleKr)+'">'+escH(titleDisplay)+'</h3>'+
       '<p class="exp-org">'+escH(item.org||'')+'</p>'+
       '<ul class="exp-list">'+listH+'</ul>'+
       (tagsH ? '<div class="exp-tags">'+tagsH+'</div>' : '');
@@ -2134,6 +2144,12 @@ var SectionAdmin = (function () {
       setTimeout(function() { setupSkillTicker(container); }, 0);
     } else {
       updateSeeMore(sec);
+    }
+    if (typeof lang !== 'undefined' && lang === 'kr') {
+      container.querySelectorAll('[data-en]').forEach(function(el) {
+        var val = el.dataset.kr;
+        if (val) el.innerHTML = val;
+      });
     }
   }
 
