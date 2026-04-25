@@ -2077,16 +2077,22 @@ var SectionAdmin = (function () {
     div.className = 'act-item reveal'; div.dataset.sid = item.id;
     div.dataset.actId = String(item.id);
     var actImgs = (actDetails[item.id]||{}).images||[];
+    var curLang = (typeof lang !== 'undefined') ? lang : 'en';
+    var titleEn = item.title||''; var titleKr = item.title_kr||titleEn;
+    var orgEn   = item.org||'';   var orgKr   = item.org_kr||orgEn;
+    var descEn  = item.desc||'';  var descKr  = item.desc_kr||descEn;
+    var statEn  = item.status||'Ongoing';
+    var statKr  = item.status_kr||(statEn==='Ongoing'?'진행중':statEn==='Completed'?'완료':statEn);
     div.innerHTML =
       '<div class="act-icon">'+escH(item.icon||'🌱')+'</div>'+
       '<div class="act-body">'+
         '<div class="act-period">'+escH(item.period||'')+'</div>'+
-        '<h3>'+escH(item.title||'')+'</h3>'+
-        '<p class="act-org">'+escH(item.org||'')+'</p>'+
-        '<p class="act-desc">'+escH(item.desc||'')+'</p>'+
+        '<h3 data-en="'+escH(titleEn)+'" data-kr="'+escH(titleKr)+'">'+escH(curLang==='kr'?titleKr:titleEn)+'</h3>'+
+        '<p class="act-org" data-en="'+escH(orgEn)+'" data-kr="'+escH(orgKr)+'">'+escH(curLang==='kr'?orgKr:orgEn)+'</p>'+
+        '<p class="act-desc" data-en="'+escH(descEn)+'" data-kr="'+escH(descKr)+'">'+escH(curLang==='kr'?descKr:descEn)+'</p>'+
         '<div class="act-photos-strip"></div>'+
       '</div>'+
-      '<span class="act-tag">'+escH(item.status||'Ongoing')+'</span>'+
+      '<span class="act-tag" data-en="'+escH(statEn)+'" data-kr="'+escH(statKr)+'">'+escH(curLang==='kr'?statKr:statEn)+'</span>'+
       '<div class="click-hint">Click to view photos</div>';
     if (actImgs.length) {
       div.querySelector('.click-hint').style.display = 'flex';
@@ -2129,17 +2135,35 @@ var SectionAdmin = (function () {
         var sid = staticEl.dataset.staticId;
         var krLines = [];
         staticEl.querySelectorAll('li[data-kr]').forEach(function(li) { krLines.push(li.dataset.kr || ''); });
-        var h3 = staticEl.querySelector('h3[data-kr]');
-        savedKr[sid] = { lines: krLines, title: h3 ? h3.dataset.kr : '' };
+        var h3    = staticEl.querySelector('h3[data-kr]');
+        var org   = staticEl.querySelector('.act-org[data-kr], .exp-org[data-kr]');
+        var desc  = staticEl.querySelector('.act-desc[data-kr]');
+        var stat  = staticEl.querySelector('.act-tag[data-kr]');
+        savedKr[sid] = {
+          lines:  krLines,
+          title:  h3   ? h3.dataset.kr   : '',
+          org:    org  ? org.dataset.kr   : '',
+          desc:   desc ? desc.dataset.kr  : '',
+          status: stat ? stat.dataset.kr  : ''
+        };
         staticEl.remove();
       });
     }
     (allData[sec] || []).forEach(function(item) {
-      if (sec === 'exp' && savedKr[item.id] && !item.desc_kr && savedKr[item.id].lines.length) {
-        item = Object.assign({}, item, {
-          desc_kr: savedKr[item.id].lines.join('\n'),
-          title_kr: item.title_kr || savedKr[item.id].title || item.title
-        });
+      if (savedKr[item.id]) {
+        var kr = savedKr[item.id];
+        var patch = {};
+        if (sec === 'exp' && !item.desc_kr && kr.lines && kr.lines.length) {
+          patch.desc_kr  = kr.lines.join('\n');
+          patch.title_kr = item.title_kr || kr.title || item.title;
+        }
+        if (sec === 'act') {
+          if (!item.title_kr  && kr.title)  patch.title_kr  = kr.title;
+          if (!item.org_kr    && kr.org)     patch.org_kr    = kr.org;
+          if (!item.desc_kr   && kr.desc)    patch.desc_kr   = kr.desc;
+          if (!item.status_kr && kr.status)  patch.status_kr = kr.status;
+        }
+        if (Object.keys(patch).length) item = Object.assign({}, item, patch);
       }
       var el = null;
       if      (sec === 'about')     el = createAboutCard(item);
