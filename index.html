@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nguyen Tan Trung — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=28">
+</head>
+<body>
+
+  <!-- Particle Canvas -->
+  <canvas id="particles"></canvas>
+  <!-- Cursor glow -->
+  <div id="cursor-glow"></div>
+  <!-- Hidden YouTube Music Player -->
+
+  <!-- ============ NAVBAR ============ -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <div class="nav-logo" id="adminTrigger" title="">
+        <span class="logo-text">NTT</span>
+        <span class="logo-dot"></span>
+      </div>
+
+      <!-- Admin photo upload panel (hidden) -->
+      <div class="admin-panel" id="adminPanel">
+        <span class="admin-label">🔒 Admin</span>
+        <label class="admin-upload-btn" for="photoInput">
+          📷 <span data-en="Change Photo" data-kr="사진 변경">Change Photo</span>
+        </label>
+        <input type="file" id="photoInput" accept="image/*" style="display:none">
+        <button class="admin-btn" id="adminEditBtn">✏️ Edit</button>
+        <button class="admin-btn admin-save-btn" id="adminSaveBtn">💾 Save</button>
+        <button class="admin-btn admin-music-btn" id="adminMusicBtn">🎵 Music</button>
+        <button class="admin-btn admin-reset-btn" id="adminResetBtn" title="Reset all text to original HTML">🔄 Reset</button>
+        <button class="admin-btn admin-export-btn" id="adminExportBtn" title="Export HTML for deployment">📤 Export</button>
+        <button class="admin-close" id="adminClose">✕</button>
+      </div>
+      <div class="nav-links">
+        <a href="#about"      data-en="About"      data-kr="소개">About</a>
+        <a href="#education"  data-en="Education"  data-kr="학력">Education</a>
+        <a href="#skills"     data-en="Skills"     data-kr="스킬">Skills</a>
+        <a href="#experience" data-en="Experience" data-kr="경험">Experience</a>
+        <a href="#certs"      data-en="Certifications" data-kr="자격증">Certifications</a>
+        <a href="#activities" data-en="Activities" data-kr="활동">Activities</a>
+        <a href="#projects"   data-en="Projects"   data-kr="프로젝트">Projects</a>
+        <a href="#contact"    data-en="Contact"    data-kr="연락처">Contact</a>
+      </div>
+      <div class="nav-right">
+        <!-- Vinyl music player -->
+        <div class="vinyl-player" id="vinylPlayer">
+          <button class="vp-side" id="vpPrev" title="Previous">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+          </button>
+          <button class="vp-disc" id="vinylBtn" title="Play / Pause">
+            <div class="vp-groove"></div>
+            <span class="vp-note n1">♪</span>
+            <span class="vp-note n2">♫</span>
+            <span class="vp-note n3">♩</span>
+            <span class="vp-note n4">♪</span>
+          </button>
+          <button class="vp-side" id="vpNext" title="Next">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2.5-6 8.5 6V6l-8.5 6z"/><path d="M16 6h2v12h-2z"/></svg>
+          </button>
+          <span class="vp-title" id="vpTitle"></span>
+        </div>
+        <a class="resume-btn" href="resume.pdf" download title="Download Resume">Resume <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-6 4h12v-2H6v2z"/></svg></a>
+        <button class="lang-toggle" id="langToggle">
+          <span class="lang-icon">🌐</span> KR
+        </button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about"      data-en="About"          data-kr="소개">About</a>
+    <a href="#education"  data-en="Education"      data-kr="학력">Education</a>
+    <a href="#skills"     data-en="Skills"         data-kr="스킬">Skills</a>
+    <a href="#experience" data-en="Experience"     data-kr="경험">Experience</a>
+    <a href="#certs"      data-en="Certifications" data-kr="자격증">Certifications</a>
+    <a href="#activities" data-en="Activities"     data-kr="활동">Activities</a>
+    <a href="#projects"   data-en="Projects"       data-kr="프로젝트">Projects</a>
+    <a href="#contact"    data-en="Contact"        data-kr="연락처">Contact</a>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <section id="hero">
+    <div class="hero-inner">
+      <div class="hero-photo-wrap">
+        <div class="photo-ring"></div>
+        <div class="photo-ring ring2"></div>
+        <div class="hero-photo">
+          <img src="images/profile.jpg" alt="Nguyen Tan Trung" id="profileImg"
+               onerror="this.style.display='none'; document.getElementById('photoFallback').style.display='flex'">
+          <div class="photo-fallback" id="photoFallback">
+            <div class="fallback-initials">NTT</div>
+          </div>
+        </div>
+        <div class="photo-badge"><span>🇻🇳</span><span>🇰🇷</span></div>
+      </div>
+
+      <div class="hero-text">
+        <div class="hero-tag" data-en="Hello, I'm" data-kr="안녕하세요, 저는">Hello, I'm</div>
+        <h1 class="hero-name">
+          <span class="name-line" id="heroName" data-en="Trung" data-kr="고승호">Trung</span>
+        </h1>
+        <div class="hero-typed-wrap">
+          <span class="hero-typed" id="typedText"></span>
+          <span class="cursor-blink">|</span>
+        </div>
+        <p class="hero-desc"
+           data-en="IT Consultant &amp; Freelancer bridging technology and business across Vietnam, Korea, and beyond."
+           data-kr="기술과 비즈니스를 연결하는 IT 컨설턴트 &amp; 프리랜서 — 베트남, 한국, 그리고 세계로.">
+          IT Consultant &amp; Freelancer bridging technology and business across Vietnam, Korea, and beyond.
+        </p>
+        <div class="hero-pills">
+          <span>MBA · GPA 4.3</span>
+          <span>TOPIK 4급</span>
+          <span>AI Expert Lv.1</span>
+        </div>
+        <div class="hero-cta">
+          <a href="#contact" class="btn-primary">
+            <span data-en="Get in Touch" data-kr="연락하기">Get in Touch</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#about" class="btn-ghost" data-en="About Me" data-kr="소개">About Me</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num" data-target="3">0</span>
+            <span class="stat-label" data-en="Languages" data-kr="언어">Languages</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" data-target="4">0</span>
+            <span class="stat-label" data-en="Certifications" data-kr="자격증">Certifications</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" data-target="4">0</span>
+            <span class="stat-label" data-en="Years Study KR" data-kr="한국 유학">Years Study KR</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" data-target="43">0</span>
+            <span class="stat-label" data-en="GPA / 45" data-kr="학점">GPA / 45</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+      <span data-en="Scroll" data-kr="스크롤">Scroll</span>
+    </div>
+
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">01</span>
+        <h2 data-en="About Me" data-kr="소개">About Me</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-image-block reveal">
+          <div class="about-slideshow" id="aboutSlideshow">
+            <!-- Main large photo -->
+            <div class="slide-main" id="slideMain">
+              <img class="slide-photo" id="slideMainImg" alt="">
+              <button class="del-btn" id="delMain">✕</button>
+            </div>
+            <!-- Two thumbnails row -->
+            <div class="slide-thumbs">
+              <div class="slide-thumb" id="slideLeft">
+                <img class="slide-photo" id="slideLeftImg" alt="">
+                <button class="del-btn" id="delLeft">✕</button>
+              </div>
+              <div class="slide-thumb" id="slideRight">
+                <img class="slide-photo" id="slideRightImg" alt="">
+                <button class="del-btn" id="delRight">✕</button>
+              </div>
+            </div>
+            <!-- Navigation arrows -->
+            <button class="slide-arrow arrow-prev" id="arrowPrev">&#8249;</button>
+            <button class="slide-arrow arrow-next" id="arrowNext">&#8250;</button>
+            <!-- Page indicator dots -->
+            <div class="slideshow-dots" id="slideshowDots"></div>
+            <!-- Admin add button (hidden until admin mode) -->
+            <button class="slideshow-add-btn" id="slideshowAddBtn" title="Add photos">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <span data-en="Add Photos" data-kr="사진 추가">Add Photos</span>
+            </button>
+            <input type="file" id="galleryInput" accept="image/*" multiple style="display:none">
+          </div>
+        </div>
+        <div class="about-content reveal">
+          <p data-en="I am an IT consultant and freelancer with a strong foundation in Information Technology and Business Management. Born in Vietnam and educated across both Vietnam and South Korea, I bring a unique global perspective to every project."
+             data-kr="저는 정보기술과 경영 관리에 탄탄한 기반을 갖춘 IT 컨설턴트이자 프리랜서입니다. 베트남에서 태어나 베트남과 한국 양국에서 교육을 받으며, 모든 프로젝트에 독특한 글로벌 시각을 제공합니다.">
+            I am an IT consultant and freelancer with a strong foundation in Information Technology and Business Management. Born in Vietnam and educated across both Vietnam and South Korea, I bring a unique global perspective to every project.
+          </p>
+          <p data-en="With a Bachelor's in Information Systems (IUH) and an MBA from Soongsil University graduating with GPA 4.3, I combine technical expertise with strategic business thinking to deliver data-driven solutions that create real impact."
+             data-kr="IUH 정보통신학과 학사와 숭실대학교 MBA(GPA 4.3 졸업)를 바탕으로, 기술 전문성과 전략적 비즈니스 사고를 결합하여 실질적인 영향을 미치는 데이터 기반 솔루션을 제공합니다.">
+            With a Bachelor's in Information Systems (IUH) and an MBA from Soongsil University graduating with <strong>GPA 4.3</strong>, I combine technical expertise with strategic business thinking to deliver data-driven solutions that create real impact.
+          </p>
+          <p data-en="Holding TOPIK Level 4 and fluent in Vietnamese, English, and Korean, I bridge communication across diverse international environments. My combined IT and marketing experience sharpens my cross-cultural business acumen."
+             data-kr="TOPIK 4급 보유자로 베트남어, 영어, 한국어에 능통하며, 다양한 국제 환경에서 소통의 교량 역할을 합니다. IT와 마케팅 경험의 결합을 통해 다문화 비즈니스 감각을 키워왔습니다.">
+            Holding <strong>TOPIK Level 4</strong> and fluent in Vietnamese, English, and Korean, I bridge communication across diverse international environments. My combined IT and marketing experience sharpens my cross-cultural business acumen.
+          </p>
+          <div class="about-info-cards" id="aboutInfoCards">
+            <div class="info-card" data-static-id="about-s1">
+              <div class="info-icon">🎓</div>
+              <div>
+                <strong data-en="MBA · GPA 4.3" data-kr="MBA · 학점 4.3">MBA · GPA 4.3</strong>
+                <span>Soongsil University, Seoul</span>
+              </div>
+            </div>
+            <div class="info-card" data-static-id="about-s2">
+              <div class="info-icon">🏆</div>
+              <div>
+                <strong data-en="TOPIK Level 4 · AI Expert Lv.1" data-kr="TOPIK 4급 · AI 전문가 1급">TOPIK Level 4 · AI Expert Lv.1</strong>
+                <span data-en="4 Professional Certifications" data-kr="전문 자격증 4개">4 Professional Certifications</span>
+              </div>
+            </div>
+            <div class="info-card" data-static-id="about-s3">
+              <div class="info-icon">🌏</div>
+              <div>
+                <strong data-en="Trilingual Professional" data-kr="3개 국어 전문가">Trilingual Professional</strong>
+                <span>Vietnamese · English · Korean (TOPIK 4)</span>
+              </div>
+            </div>
+          </div>
+          <div class="see-more-wrap" id="aboutSeeMore" style="display:none">
+            <button class="see-more-btn" data-section="about">
+              <span data-en="See More" data-kr="더 보기">See More</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="section-admin-bar" id="aboutAdminBar">
+            <button class="section-add-btn" data-add-section="about">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <span data-en="Add Info Card" data-kr="정보 카드 추가">Add Info Card</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EDUCATION ============ -->
+  <section id="education">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">02</span>
+        <h2 data-en="Education" data-kr="학력">Education</h2>
+      </div>
+      <div class="edu-timeline" id="eduTimeline">
+
+        <div class="edu-item reveal" data-edu-id="mba" data-static-id="edu-mba">
+          <div class="edu-year">2023 — 2025</div>
+          <div class="edu-card">
+            <div class="edu-card-glow"></div>
+            <div class="edu-logo">🎓</div>
+            <div class="edu-body">
+              <span class="edu-badge" data-en="MBA · GPA 4.3" data-kr="경영학 석사 · 학점 4.3">MBA · GPA 4.3</span>
+              <h3 data-en="Master of Business Administration" data-kr="경영학 석사 (MBA)">Master of Business Administration</h3>
+              <p class="edu-school">숭실대학교 경영대학원 · Soongsil University Graduate School of Business</p>
+              <p class="edu-location">📍 Seoul, South Korea</p>
+              <p class="edu-desc"
+                 data-en="Graduated with GPA 4.3. Studied management theories, business strategies, and real-world case analysis. Developed analytical thinking and leadership in international environments with students from diverse nationalities."
+                 data-kr="GPA 4.3으로 졸업. 경영 이론, 비즈니스 전략, 실제 사례를 체계적으로 연구. 다양한 국적의 유학생들과 함께하는 국제 환경에서 분석적 사고와 리더십을 개발했습니다.">
+                Graduated with <strong>GPA 4.3</strong>. Studied management theories, business strategies, and real-world case analysis. Developed analytical thinking and leadership in international environments with students from diverse nationalities.
+              </p>
+            </div>
+          <div class="click-hint">Click to view</div>
+          </div>
+        </div>
+
+        <div class="edu-item reveal" data-edu-id="korean" data-static-id="edu-korean">
+          <div class="edu-year">2022 — 2023</div>
+          <div class="edu-card">
+            <div class="edu-card-glow"></div>
+            <div class="edu-logo">🗣️</div>
+            <div class="edu-body">
+              <span class="edu-badge" data-en="Language · Intermediate–Advanced" data-kr="어학 · 중·고급">Language · Intermediate–Advanced</span>
+              <h3 data-en="Korean Language Program (Intermediate–Advanced)" data-kr="한국어교육 (중·고급)">Korean Language Program (Intermediate–Advanced)</h3>
+              <p class="edu-school">광운대학교 국제교육원 · Kwangwoon University International Education Center</p>
+              <p class="edu-location">📍 Seoul, South Korea</p>
+              <p class="edu-desc"
+                 data-en="Completed intermediate-to-advanced Korean language training. Gained deep insight into Korean business culture, organizational communication, and professional etiquette. Currently holds TOPIK Level 4."
+                 data-kr="한국어 중·고급 과정 수료. 한국 비즈니스 문화, 조직 내 커뮤니케이션, 비즈니스 예절에 대한 깊은 이해를 갖추었습니다. 현재 TOPIK 4급 보유.">
+                Completed intermediate-to-advanced Korean language training. Gained deep insight into Korean business culture and professional etiquette. Currently holds <strong>TOPIK Level 4</strong>.
+              </p>
+            </div>
+          <div class="click-hint">Click to view</div>
+          </div>
+        </div>
+
+        <div class="edu-item reveal" data-edu-id="bachelor" data-static-id="edu-bachelor">
+          <div class="edu-year">2017 — 2022</div>
+          <div class="edu-card">
+            <div class="edu-card-glow"></div>
+            <div class="edu-logo">💻</div>
+            <div class="edu-body">
+              <span class="edu-badge" data-en="Bachelor's" data-kr="학사">Bachelor's</span>
+              <h3 data-en="Bachelor of Information &amp; Communication" data-kr="정보통신학과 학사">Bachelor of Information &amp; Communication</h3>
+              <p class="edu-school">호치민공업대학교 (IUH) · Industrial University of Ho Chi Minh City</p>
+              <p class="edu-location">📍 Ho Chi Minh City, Vietnam</p>
+              <p class="edu-desc"
+                 data-en="Built a strong foundation in IT systems, databases, and data-driven problem solving — the cornerstone of both practical work and subsequent management research."
+                 data-kr="IT 시스템, 데이터베이스, 데이터 기반 문제 해결에 탄탄한 기초를 쌓았습니다. 이후 경영 연구와 실무의 초석이 되었습니다.">
+                Built a strong foundation in IT systems, databases, and data-driven problem solving — the cornerstone of both practical work and subsequent management research.
+              </p>
+            </div>
+          <div class="click-hint">Click to view</div>
+          </div>
+        </div>
+
+        <div class="edu-item reveal" data-edu-id="highschool" data-static-id="edu-highschool">
+          <div class="edu-year">2014 — 2017</div>
+          <div class="edu-card">
+            <div class="edu-card-glow"></div>
+            <div class="edu-logo">🏫</div>
+            <div class="edu-body">
+              <span class="edu-badge" data-en="High School" data-kr="고등학교">High School</span>
+              <h3 data-en="High School Diploma" data-kr="고등학교 졸업">High School Diploma</h3>
+              <p class="edu-school">호앙 반 투 고등학교 · Hoang Van Thu High School</p>
+              <p class="edu-location">📍 Vietnam</p>
+              <p class="edu-desc"
+                 data-en="Served as class president, cultivating leadership and responsibility. Developed time management skills and diligence that form the foundation for completing any task."
+                 data-kr="반장으로 활동하며 리더십과 책임감을 길렀습니다. 시간 관리 능력과 성실함을 개발하여 이후 모든 일을 완수하는 기반이 되었습니다.">
+                Served as class president, cultivating leadership and responsibility. Developed time management skills and diligence that became the foundation for completing any task.
+              </p>
+            </div>
+          <div class="click-hint">Click to view</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="see-more-wrap" id="eduSeeMore" style="display:none">
+        <button class="see-more-btn" data-section="edu">
+          <span data-en="See More" data-kr="더 보기">See More</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="section-admin-bar" id="eduAdminBar">
+        <button class="section-add-btn" data-add-section="edu">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-en="Add Education" data-kr="학력 추가">Add Education</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SKILLS ============ -->
+  <section id="skills">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">03</span>
+        <h2 data-en="Skills" data-kr="스킬">Skills</h2>
+      </div>
+      <div class="skills-layout">
+        <div class="skill-block reveal">
+          <h3 data-en="⚙️ Technical" data-kr="⚙️ 기술">⚙️ Technical</h3>
+          <div class="skill-list" id="skillListTech">
+            <div class="skill-row" data-level="85" data-static-id="st-s1">
+              <img class="sk-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="">
+              <div class="sk-info"><span class="sk-name">Python</span><span class="sk-cat">Language</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="88" data-static-id="st-s2">
+              <img class="sk-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/microsoftsqlserver/microsoftsqlserver-plain.svg" alt="">
+              <div class="sk-info"><span class="sk-name">SQL / MS SQL Server</span><span class="sk-cat">Database</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="82" data-static-id="st-s3">
+              <img class="sk-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" alt="">
+              <div class="sk-info"><span class="sk-name">HTML5 / CSS3 / PHP</span><span class="sk-cat">Language</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="75" data-static-id="st-s4">
+              <img class="sk-icon" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" alt="">
+              <div class="sk-info"><span class="sk-name">JavaScript</span><span class="sk-cat">Language</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="80" data-static-id="st-s5">
+              <div class="sk-badge" style="background:#1e40af">D</div>
+              <div class="sk-info"><span class="sk-name">DBMS</span><span class="sk-cat">Database</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="70" data-static-id="st-s6">
+              <div class="sk-badge" style="background:#065f46">I</div>
+              <div class="sk-info"><span class="sk-name">IoT</span><span class="sk-cat">Technology</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+          </div>
+          <div class="see-more-wrap" id="skillTechSM" style="display:none">
+            <button class="see-more-btn" data-section="skillTech">
+              <span data-en="See More" data-kr="더 보기">See More</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="section-admin-bar" id="skillTechBar">
+            <button class="section-add-btn" data-add-section="skillTech">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <span data-en="Add Technical Skill" data-kr="기술 스킬 추가">Add Technical Skill</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="skill-block reveal">
+          <h3 data-en="📊 Business &amp; Tools" data-kr="📊 비즈니스 &amp; 도구">📊 Business &amp; Tools</h3>
+          <div class="skill-list" id="skillListBiz">
+            <div class="skill-row" data-level="93" data-static-id="sb-s1">
+              <div class="sk-badge" style="background:#217346">X</div>
+              <div class="sk-info"><span class="sk-name">Microsoft Excel</span><span class="sk-cat">Office Tool</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="91" data-static-id="sb-s2">
+              <div class="sk-badge" style="background:#d24726">P</div>
+              <div class="sk-info"><span class="sk-name">Microsoft PowerPoint</span><span class="sk-cat">Office Tool</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="85" data-static-id="sb-s3">
+              <div class="sk-badge" style="background:#7c3aed">S</div>
+              <div class="sk-info"><span class="sk-name" data-en="SNS Marketing / Data Analysis" data-kr="SNS 마케팅 / 데이터 분석">SNS Marketing / Data Analysis</span><span class="sk-cat">Marketing</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="88" data-static-id="sb-s4">
+              <div class="sk-badge" style="background:#0891b2">T</div>
+              <div class="sk-info"><span class="sk-name" data-en="KO–VI–EN Translation" data-kr="한국어-베트남어-영어 통번역">KO–VI–EN Translation</span><span class="sk-cat">Language</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+            <div class="skill-row" data-level="80" data-static-id="sb-s5">
+              <div class="sk-badge" style="background:#ea580c">A</div>
+              <div class="sk-info"><span class="sk-name" data-en="AI Tools &amp; Prompt Engineering" data-kr="AI 도구 &amp; 프롬프트 엔지니어링">AI Tools &amp; Prompt Engineering</span><span class="sk-cat">AI Tools</span></div>
+              <div class="skill-bar" style="display:none"><div class="skill-fill"></div></div>
+            </div>
+          </div>
+          <div class="see-more-wrap" id="skillBizSM" style="display:none">
+            <button class="see-more-btn" data-section="skillBiz">
+              <span data-en="See More" data-kr="더 보기">See More</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="section-admin-bar" id="skillBizBar">
+            <button class="section-add-btn" data-add-section="skillBiz">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              <span data-en="Add Business Skill" data-kr="비즈니스 스킬 추가">Add Business Skill</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="skill-block reveal">
+          <h3 data-en="🌐 Languages" data-kr="🌐 언어">🌐 Languages</h3>
+          <div class="lang-cards">
+            <div class="lang-card">
+              <span class="lang-flag">🇻🇳</span>
+              <div><strong>Vietnamese</strong><em data-en="Native" data-kr="모국어">Native</em></div>
+              <div class="lang-dots">
+                <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
+              </div>
+            </div>
+            <div class="lang-card">
+              <span class="lang-flag">🇺🇸</span>
+              <div><strong>English</strong><em data-en="Professional" data-kr="전문">Professional</em></div>
+              <div class="lang-dots">
+                <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot"></span>
+              </div>
+            </div>
+            <div class="lang-card">
+              <span class="lang-flag">🇰🇷</span>
+              <div><strong>Korean</strong><em data-en="TOPIK Level 4" data-kr="TOPIK 4급">TOPIK Level 4</em></div>
+              <div class="lang-dots">
+                <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIENCE ============ -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">04</span>
+        <h2 data-en="Experience" data-kr="경험">Experience</h2>
+      </div>
+      <div class="exp-grid" id="expGrid">
+
+        <div class="exp-card reveal" data-static-id="exp-s1">
+          <div class="exp-card-top">
+            <div class="exp-icon">💼</div>
+            <span class="exp-tag">2020.08 — 2022.01</span>
+          </div>
+          <h3>Freelancer</h3>
+          <p class="exp-org">트레져헌터 · Treasure Hunter</p>
+          <ul class="exp-list">
+            <li data-en="Managed Vietnamese YouTube channels for Korean companies targeting the Vietnamese market."
+                data-kr="한국 기업의 베트남 유튜브 채널 운영 및 관리 (베트남 시장 타겟팅)">
+              Managed Vietnamese YouTube channels for Korean companies targeting the Vietnamese market.
+            </li>
+            <li data-en="Planned content and supported marketing campaigns for the Vietnamese audience."
+                data-kr="베트남 시장 대상 콘텐츠 기획 및 마케팅 캠페인 지원">
+              Planned content and supported marketing campaigns for the Vietnamese audience.
+            </li>
+            <li data-en="Provided Korean–Vietnamese business communication and translation services."
+                data-kr="한국어–베트남어 비즈니스 커뮤니케이션 및 통번역 서비스 제공">
+              Provided Korean–Vietnamese business communication and translation services.
+            </li>
+            <li data-en="Analyzed SNS data to propose operational improvements and growth strategies."
+                data-kr="SNS 데이터 분석을 통한 운영 개선 및 성장 전략 제안">
+              Analyzed SNS data to propose operational improvements and growth strategies.
+            </li>
+          </ul>
+          <div class="exp-tags">
+            <span>YouTube</span><span>Content Marketing</span><span>KO–VI Translation</span><span>SNS Analysis</span>
+          </div>
+        </div>
+
+        <div class="exp-card reveal" data-static-id="exp-s2">
+          <div class="exp-card-top">
+            <div class="exp-icon">🖥️</div>
+            <span class="exp-tag">2021.09 — 2021.12</span>
+          </div>
+          <h3 data-en="IT Intern" data-kr="IT 인턴">IT Intern</h3>
+          <p class="exp-org">TOP APEC 주식회사 · TOP APEC Co., Ltd.</p>
+          <ul class="exp-list">
+            <li data-en="Operated and managed platform software systems, including documentation."
+                data-kr="플랫폼 소프트웨어 운영 관리 및 문서 정리">
+              Operated and managed platform software systems, including documentation.
+            </li>
+            <li data-en="Supported internal communication and administrative tasks across departments."
+                data-kr="부서 간 내부 커뮤니케이션 및 행정 업무 지원">
+              Supported internal communication and administrative tasks across departments.
+            </li>
+            <li data-en="Assisted with data organization and preparation of reporting materials."
+                data-kr="데이터 정리 및 보고 자료 작성 보조">
+              Assisted with data organization and preparation of reporting materials.
+            </li>
+          </ul>
+          <div class="exp-tags">
+            <span>Platform Software</span><span>Data Management</span><span>IT Support</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="see-more-wrap" id="expSeeMore" style="display:none">
+        <button class="see-more-btn" data-section="exp">
+          <span data-en="See More" data-kr="더 보기">See More</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="section-admin-bar" id="expAdminBar">
+        <button class="section-add-btn" data-add-section="exp">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-en="Add Experience" data-kr="경험 추가">Add Experience</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CERTIFICATIONS ============ -->
+  <section id="certs">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">05</span>
+        <h2 data-en="Certifications" data-kr="자격증">Certifications</h2>
+      </div>
+      <div class="certs-grid" id="certsGrid">
+
+        <div class="cert-card reveal" data-cert-id="topik" data-static-id="cert-topik">
+          <div class="cert-icon">🇰🇷</div>
+          <div class="cert-body">
+            <div class="cert-score">189점 / 4급</div>
+            <h3 data-en="Korean Proficiency Test (TOPIK)" data-kr="한국어능력시험 (TOPIK)">Korean Proficiency Test (TOPIK)</h3>
+            <p class="cert-org" data-en="National Institute for International Education" data-kr="국립국제교육원">National Institute for International Education</p>
+            <span class="cert-date">2024.11.28</span>
+          </div>
+          <div class="cert-badge topik">TOPIK 4</div>
+          <div class="click-hint">Click to view</div>
+        </div>
+
+        <div class="cert-card reveal" data-cert-id="ai" data-static-id="cert-ai">
+          <div class="cert-icon">🤖</div>
+          <div class="cert-body">
+            <div class="cert-score">95점 / 1급</div>
+            <h3 data-en="AI Expert — Level 1" data-kr="인공지능(AI)전문가 1급">AI Expert — Level 1</h3>
+            <p class="cert-org" data-en="Korea Qualification Evaluation Institute" data-kr="한국자격검정평가진흥원">Korea Qualification Evaluation Institute</p>
+            <span class="cert-date">2026.01.08</span>
+          </div>
+          <div class="cert-badge ai">95점</div>
+          <div class="click-hint">Click to view</div>
+        </div>
+
+        <div class="cert-card reveal" data-cert-id="sns" data-static-id="cert-sns">
+          <div class="cert-icon">📱</div>
+          <div class="cert-body">
+            <div class="cert-score">85점 / 1급</div>
+            <h3 data-en="SNS Marketing Expert — Level 1" data-kr="SNS마케팅전문가 1급">SNS Marketing Expert — Level 1</h3>
+            <p class="cert-org" data-en="Korea Qualification Evaluation Institute" data-kr="한국자격검정평가진흥원">Korea Qualification Evaluation Institute</p>
+            <span class="cert-date">2026.01.08</span>
+          </div>
+          <div class="cert-badge sns">85점</div>
+          <div class="click-hint">Click to view</div>
+        </div>
+
+        <div class="cert-card reveal" data-cert-id="kiip" data-static-id="cert-kiip">
+          <div class="cert-icon">🏛️</div>
+          <div class="cert-body">
+            <div class="cert-score">76점</div>
+            <h3 data-en="Social Integration Program (KIIP)" data-kr="사회통합프로그램종합평가 (KIIP)">Social Integration Program (KIIP)</h3>
+            <p class="cert-org" data-en="Ministry of Justice, Republic of Korea" data-kr="대한민국 법무부">Ministry of Justice, Republic of Korea</p>
+            <span class="cert-date">2025.07.19</span>
+          </div>
+          <div class="cert-badge kiip">KIIP</div>
+          <div class="click-hint">Click to view</div>
+        </div>
+
+      </div>
+      <div class="see-more-wrap" id="certsSeeMore" style="display:none">
+        <button class="see-more-btn" data-section="cert">
+          <span data-en="See More" data-kr="더 보기">See More</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="section-admin-bar" id="certsAdminBar">
+        <button class="section-add-btn" data-add-section="cert">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-en="Add Certification" data-kr="자격증 추가">Add Certification</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ACTIVITIES ============ -->
+  <section id="activities">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">06</span>
+        <h2 data-en="Activities &amp; Volunteer" data-kr="대외활동 &amp; 봉사">Activities &amp; Volunteer</h2>
+      </div>
+      <div class="act-list" id="actList">
+
+        <div class="act-item reveal" data-static-id="act-s1" data-act-id="act-s1">
+          <div class="act-icon">🎨</div>
+          <div class="act-body">
+            <div class="act-period">2025.06.30 — <span data-en="Present" data-kr="현재">Present</span></div>
+            <h3 data-en="Memory Game Coloring Volunteer" data-kr="메모리게임 컬러링 색칠하기 자원봉사">Memory Game Coloring Volunteer</h3>
+            <p class="act-org">Spring Shine (스프링샤인)</p>
+            <p class="act-desc" data-en="Ongoing volunteer activity supporting creative coloring and memory game programs."
+               data-kr="지속적인 자원봉사 활동으로 창의적인 색칠하기 및 메모리게임 프로그램을 지원합니다.">
+              Ongoing volunteer activity supporting creative coloring and memory game programs.
+            </p>
+            <div class="act-photos-strip"></div>
+          </div>
+          <span class="act-tag" data-en="Ongoing" data-kr="진행중">Ongoing</span>
+          <div class="click-hint">Click to view photos</div>
+        </div>
+
+        <div class="act-item reveal" data-static-id="act-s2" data-act-id="act-s2">
+          <div class="act-icon">🍚</div>
+          <div class="act-body">
+            <div class="act-period">2025.04 — 2025.06</div>
+            <h3 data-en="Senior Dining Hall Volunteer" data-kr="경로식당 자원봉사">Senior Dining Hall Volunteer</h3>
+            <p class="act-org" data-en="Sadang Senior Welfare Center" data-kr="사당어르신종합복지관">Sadang Senior Welfare Center (사당어르신종합복지관)</p>
+            <p class="act-desc" data-en="Volunteered at a senior community dining hall, supporting meal services for elderly residents."
+               data-kr="어르신 복지관 경로식당에서 자원봉사하며 노인 식사 서비스를 지원했습니다.">
+              Volunteered at a senior community dining hall, supporting meal services for elderly residents.
+            </p>
+            <div class="act-photos-strip"></div>
+          </div>
+          <span class="act-tag" data-en="Completed" data-kr="완료">Completed</span>
+          <div class="click-hint">Click to view photos</div>
+        </div>
+
+        <div class="act-item reveal" data-static-id="act-s3" data-act-id="act-s3">
+          <div class="act-icon">🧸</div>
+          <div class="act-body">
+            <div class="act-period">2025.08.28 — 2025.09.11</div>
+            <h3 data-en="Toy &amp; Book Sanitation Assistant" data-kr="장난감/도서 위생 관리(세척) 보조">Toy &amp; Book Sanitation Assistant</h3>
+            <p class="act-org" data-en="Seoul Metropolitan Childcare Support Center · Seoul Toy Library" data-kr="서울특별시육아종합지원센터 · 서울장난감도서관">Seoul Metropolitan Childcare Support Center · Seoul Toy Library</p>
+            <p class="act-desc" data-en="Assisted with hygiene management and cleaning of toys and books at the Seoul Toy Library."
+               data-kr="서울장난감도서관에서 장난감 및 도서의 위생 관리 및 세척 작업을 보조했습니다.">
+              Assisted with hygiene management and cleaning of toys and books at the Seoul Toy Library.
+            </p>
+            <div class="act-photos-strip"></div>
+          </div>
+          <span class="act-tag" data-en="Completed" data-kr="완료">Completed</span>
+          <div class="click-hint">Click to view photos</div>
+        </div>
+
+      </div>
+      <div class="see-more-wrap" id="actSeeMore" style="display:none">
+        <button class="see-more-btn" data-section="act">
+          <span data-en="See More" data-kr="더 보기">See More</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="section-admin-bar" id="actAdminBar">
+        <button class="section-add-btn" data-add-section="act">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-en="Add Activity" data-kr="활동 추가">Add Activity</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROJECTS ============ -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">07</span>
+        <h2 data-en="Projects" data-kr="프로젝트">Projects</h2>
+      </div>
+      <div class="projects-grid" id="projectsGrid">
+        <div class="proj-empty" id="projEmpty">
+          <div class="proj-empty-icon">📂</div>
+          <p data-en="No projects added yet." data-kr="아직 프로젝트가 없습니다.">No projects added yet.</p>
+          <p class="proj-empty-hint" data-en="Type ntt to enter admin mode, then click ✏️ Edit to add your projects." data-kr="ntt를 입력해 관리자 모드 진입 후 ✏️ Edit을 눌러 프로젝트를 추가하세요.">Type ntt to enter admin mode, then click ✏️ Edit to add your projects.</p>
+        </div>
+      </div>
+      <div class="proj-admin-bar" id="projAdminBar">
+        <button class="proj-add-btn" id="projAddBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-en="Add Project" data-kr="프로젝트 추가">Add Project</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-num">08</span>
+        <h2 data-en="Get In Touch" data-kr="연락하기">Get In Touch</h2>
+      </div>
+      <div class="contact-layout">
+        <div class="contact-cards reveal" id="contactCards">
+          <a href="mailto:ntantrung595@gmail.com" class="ccard" data-static-id="cc-gmail">
+            <div class="ccard-icon gmail">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <div><span class="ccard-label">Gmail</span><span class="ccard-val">ntantrung595@gmail.com</span></div>
+            <svg class="ccard-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="mailto:ntantrung595@naver.com" class="ccard" data-static-id="cc-naver">
+            <div class="ccard-icon naver">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <div><span class="ccard-label">Naver</span><span class="ccard-val">ntantrung595@naver.com</span></div>
+            <svg class="ccard-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="tel:01050852245" class="ccard" data-static-id="cc-phone">
+            <div class="ccard-icon phone">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5a2 2 0 0 1 1.99-2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <div><span class="ccard-label" data-en="Phone" data-kr="전화">Phone</span><span class="ccard-val">010-5085-2245</span></div>
+            <svg class="ccard-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="https://www.instagram.com/seungho.fm" target="_blank" rel="noopener noreferrer" class="ccard" data-static-id="cc-ig">
+            <div class="ccard-icon ig">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor"/></svg>
+            </div>
+            <div><span class="ccard-label">Instagram</span><span class="ccard-val">@seungho.fm</span></div>
+            <svg class="ccard-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="https://github.com/Tantrung595" target="_blank" rel="noopener noreferrer" class="ccard" data-static-id="cc-github">
+            <div class="ccard-icon github">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            </div>
+            <div><span class="ccard-label">GitHub</span><span class="ccard-val">Tantrung595</span></div>
+            <svg class="ccard-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="https://www.tiktok.com/@andrew19196" target="_blank" rel="noopener noreferrer" class="ccard" data-static-id="cc-tiktok">
+            <div class="ccard-icon tiktok">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.77a4.85 4.85 0 0 1-1.01-.08z"/></svg>
+            </div>
+            <div><span class="ccard-label">TikTok</span><span class="ccard-val">@andrew19196</span></div>
+            <svg class="ccard-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+        <div class="contact-form-wrap reveal">
+          <p class="cf-desc" data-en="Available for consulting projects, freelance work, or just a conversation. Feel free to reach out!"
+             data-kr="컨설팅 프로젝트, 프리랜서 작업, 또는 간단한 대화를 위해 언제든지 연락 주세요!">
+            Available for consulting projects, freelance work, or just a conversation. Feel free to reach out!
+          </p>
+          <form class="contact-form" id="contactForm" novalidate>
+            <div class="cf-field">
+              <input type="text" id="cfName" placeholder="Full Name *" autocomplete="name">
+            </div>
+            <div class="cf-field">
+              <input type="email" id="cfEmail" placeholder="Email Address *" autocomplete="email">
+            </div>
+            <div class="cf-field">
+              <textarea id="cfMsg" rows="3" placeholder="Your message…"></textarea>
+            </div>
+            <button type="submit" class="cf-submit" id="cfSubmit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4 20-7z"/><path d="M22 2 11 13"/></svg>
+              <span data-en="Send Message" data-kr="메시지 보내기">Send Message</span>
+            </button>
+          </form>
+        </div>
+      </div>
+      <div class="see-more-wrap" id="contactSeeMore" style="display:none">
+        <button class="see-more-btn" data-section="contact">
+          <span data-en="See More" data-kr="더 보기">See More</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="section-admin-bar" id="contactAdminBar">
+        <button class="section-add-btn" data-add-section="contact">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          <span data-en="Add Contact" data-kr="연락처 추가">Add Contact</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">NTT</div>
+        <p data-en="© 2025 Nguyen Tan Trung. All rights reserved." data-kr="© 2025 응우옌 탄 쭝. 모든 권리 보유.">© 2025 Nguyen Tan Trung. All rights reserved.</p>
+        <div class="footer-langs">🇻🇳 🇰🇷 🌐</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ ADMIN PASSWORD MODAL ============ -->
+  <div class="pw-overlay" id="pwOverlay">
+    <div class="pw-modal" id="pwModal">
+      <button class="pw-close" id="pwClose">✕</button>
+      <div class="pw-icon">🔒</div>
+      <h3 class="pw-title">Admin Access</h3>
+      <p class="pw-hint">Enter password to continue</p>
+      <input type="password" class="pw-input" id="pwInput" placeholder="••••••" autocomplete="off" maxlength="20">
+      <p class="pw-error" id="pwError">Incorrect password</p>
+      <button class="pw-btn" id="pwConfirm">Confirm</button>
+    </div>
+  </div>
+
+  <!-- ============ EDUCATION DETAIL MODAL ============ -->
+  <div class="ed-overlay" id="edOverlay">
+    <div class="ed-modal">
+      <button class="ed-close" id="edClose">✕</button>
+
+      <div class="ed-img-wrap">
+        <img class="ed-cert-img" id="edCertImg" alt="" style="display:none">
+        <div class="ed-placeholder" id="edPlaceholder">
+          <span class="ed-ph-watermark">EDUCATION</span>
+          <div class="ed-ph-glow"></div>
+          <div class="ed-ph-icon" id="edPhIcon">🎓</div>
+          <div class="ed-ph-year" id="edPhYear"></div>
+          <div class="ed-ph-title" id="edPhTitle"></div>
+          <div class="ed-ph-line"></div>
+        </div>
+      </div>
+
+      <div class="ed-body">
+        <div class="ed-top-row">
+          <div class="ed-badge-wrap" id="edBadgeWrap"></div>
+          <div class="ed-meta">
+            <h3 class="ed-degree" id="edDegree"></h3>
+            <p class="ed-school" id="edSchool"></p>
+            <span class="ed-year-label" id="edYearLabel"></span>
+          </div>
+        </div>
+        <p class="ed-desc-text" id="edDescText"></p>
+        <p class="ed-achievement" id="edAchievement"></p>
+        <a class="ed-link" id="edLink" target="_blank" rel="noopener noreferrer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visit Institution
+        </a>
+      </div>
+
+      <div class="ed-admin-bar" id="edAdminBar">
+        <button class="ed-edit-toggle" id="edEditToggle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Details
+        </button>
+      </div>
+
+      <div class="ed-edit-form" id="edEditForm">
+        <div class="ed-ef-field">
+          <label>Diploma / Degree Image</label>
+          <label class="ed-upload-btn" for="edImgInput">📷 Upload Image</label>
+          <button type="button" class="cd-clear-img-btn" id="edClearImgBtn" style="display:none">✕ Xóa ảnh</button>
+          <input type="file" id="edImgInput" accept="image/*" style="display:none">
+          <img class="ed-upload-preview" id="edUploadPreview" alt="" style="display:none">
+        </div>
+        <div class="ed-ef-field">
+          <label>Achievements / Thesis (optional)</label>
+          <textarea id="edAchievementInput" rows="2" placeholder="e.g. Dean's List, Thesis title, GPA…"></textarea>
+        </div>
+        <div class="ed-ef-field">
+          <label>Institution Link (optional)</label>
+          <input type="url" id="edLinkInput" placeholder="https://…">
+        </div>
+        <div class="ed-ef-actions">
+          <button class="ed-save-btn" id="edSaveBtn">💾 Save</button>
+          <button class="ed-cancel-edit" id="edCancelEdit">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CERTIFICATE DETAIL MODAL ============ -->
+  <div class="cd-overlay" id="cdOverlay">
+    <div class="cd-modal">
+      <button class="cd-close" id="cdClose">✕</button>
+
+      <!-- Certificate image / placeholder -->
+      <div class="cd-img-wrap" id="cdImgWrap">
+        <img class="cd-cert-img" id="cdCertImg" alt="" style="display:none">
+        <div class="cd-placeholder" id="cdPlaceholder">
+          <span class="cd-ph-watermark">CERTIFICATE</span>
+          <div class="cd-ph-glow"></div>
+          <div class="cd-ph-icon" id="cdPhIcon">🏆</div>
+          <div class="cd-ph-badge" id="cdPhBadge"></div>
+          <div class="cd-ph-title" id="cdPhTitle"></div>
+          <div class="cd-ph-line"></div>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="cd-body">
+        <div class="cd-top-row">
+          <div class="cd-score-badge" id="cdScoreBadge"></div>
+          <div class="cd-meta">
+            <h3 class="cd-cert-name" id="cdCertName"></h3>
+            <p class="cd-cert-org" id="cdCertOrg"></p>
+            <span class="cd-cert-date" id="cdCertDate"></span>
+          </div>
+        </div>
+        <p class="cd-cert-desc" id="cdCertDesc"></p>
+        <a class="cd-cert-link" id="cdCertLink" target="_blank" rel="noopener noreferrer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View Certificate
+        </a>
+      </div>
+
+      <!-- Admin bar -->
+      <div class="cd-admin-bar" id="cdAdminBar">
+        <button class="cd-edit-toggle" id="cdEditToggle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Details
+        </button>
+      </div>
+
+      <!-- Edit form -->
+      <div class="cd-edit-form" id="cdEditForm">
+        <div class="cd-ef-field">
+          <label>Certificate Image</label>
+          <label class="cd-upload-btn" for="cdImgInput">📷 Upload Image</label>
+          <button type="button" class="cd-clear-img-btn" id="cdClearImgBtn" style="display:none">✕ Xóa ảnh</button>
+          <input type="file" id="cdImgInput" accept="image/*" style="display:none">
+          <img class="cd-upload-preview" id="cdUploadPreview" alt="" style="display:none">
+        </div>
+        <div class="cd-ef-field">
+          <label>Description (optional)</label>
+          <textarea id="cdDescInput" rows="3" placeholder="Add notes about this certificate…"></textarea>
+        </div>
+        <div class="cd-ef-field">
+          <label>Verification Link (optional)</label>
+          <input type="url" id="cdLinkInput" placeholder="https://…">
+        </div>
+        <div class="cd-ef-actions">
+          <button class="cd-save-btn" id="cdSaveBtn">💾 Save</button>
+          <button class="cd-cancel-edit" id="cdCancelEdit">Cancel</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ SECTION ITEM MODAL ============ -->
+  <div class="si-overlay" id="siOverlay">
+    <div class="si-modal">
+      <div class="si-header">
+        <h3 id="siTitle">Add Item</h3>
+        <button class="si-close" id="siClose">✕</button>
+      </div>
+      <div class="si-body" id="siBody"></div>
+      <div class="si-footer">
+        <button class="si-btn-cancel" id="siCancel">Cancel</button>
+        <button class="si-btn-save" id="siSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROJECT MODAL ============ -->
+  <div class="pm-overlay" id="pmOverlay">
+    <div class="pm-modal">
+      <div class="pm-header">
+        <h3 id="pmTitle">Add Project</h3>
+        <button class="pm-close" id="pmClose">✕</button>
+      </div>
+      <div class="pm-body">
+        <div class="pm-field">
+          <label>Title *</label>
+          <input type="text" id="pmName" placeholder="e.g. MBA Thesis Research">
+        </div>
+        <div class="pm-field">
+          <label>Description *</label>
+          <textarea id="pmDesc" rows="3" placeholder="What did you build or achieve?"></textarea>
+        </div>
+        <div class="pm-field">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="pmTags" placeholder="e.g. Python, SQL, Excel">
+        </div>
+        <div class="pm-field">
+          <label>Link (optional)</label>
+          <input type="url" id="pmLink" placeholder="https://...">
+        </div>
+        <div class="pm-field">
+          <label>Image (optional)</label>
+          <label class="pm-img-btn" for="pmImg">📷 Choose Image</label>
+          <input type="file" id="pmImg" accept="image/*" style="display:none">
+          <img class="pm-img-preview" id="pmImgPreview" alt="" style="display:none">
+        </div>
+      </div>
+      <div class="pm-footer">
+        <button class="pm-btn-cancel" id="pmCancel">Cancel</button>
+        <button class="pm-btn-save" id="pmSaveBtn">Save Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Background Music ── -->
+  <audio id="bgMusic" preload="auto"></audio>
+
+
+  <!-- Music Manager Modal (admin) -->
+  <div class="mm-overlay" id="mmOverlay">
+    <div class="mm-modal">
+      <div class="mm-header">
+        <h3>🎵 Playlist Manager</h3>
+        <button class="mm-close" id="mmClose">✕</button>
+      </div>
+      <p class="mm-hint">Place <code>.mp3</code> files inside the <code>music/</code> folder, then add them here.</p>
+      <div class="mm-list" id="mmList"></div>
+      <div class="mm-add-row">
+        <input type="text" id="mmTitleInput" placeholder="Song title" maxlength="60">
+        <input type="text" id="mmFileInput" placeholder="filename.mp3">
+        <button class="mm-add-btn" id="mmAddBtn">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ── Supabase sync: fetch latest data before rendering ── */
+  (function() {
+    var SURL = 'https://ryqmjaxmlksdbxzilwgs.supabase.co';
+    var SKEY = 'sb_publishable_RQiKqaEcZaDIoc8s45r_lg_Vkrw-EDI';
+    window._sbCfg = { url: SURL, key: SKEY, bucket: 'portfolio-images1' };
+    var TS_KEY = 'ntt_sb_ts';
+    var VER_KEY = 'ntt_sb_ver';
+    var CACHE_MS = 30 * 1000;
+
+    var _syncRunning = false;
+    var _syncPending = false;
+
+    function doSync(hideWhileFetching) {
+      if (_syncRunning) {
+        if (!hideWhileFetching) _syncPending = true;
+        return;
+      }
+      _syncRunning = true;
+      _syncPending = false;
+      if (hideWhileFetching) document.documentElement.style.visibility = 'hidden';
+
+      var fallback = setTimeout(function() {
+        document.documentElement.style.visibility = '';
+        _syncRunning = false;
+        if (_syncPending) { _syncPending = false; setTimeout(function() { doSync(false); }, 100); }
+      }, 8000);
+
+      fetch(SURL + '/rest/v1/portfolio_data?select=key,value', {
+        headers: { 'apikey': SKEY, 'Authorization': 'Bearer ' + SKEY }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(rows) {
+        clearTimeout(fallback);
+        var hadPending = _syncPending;
+        _syncRunning = false;
+        _syncPending = false;
+        if (!Array.isArray(rows) || !rows.length) {
+          localStorage.setItem(TS_KEY, Date.now().toString());
+          document.documentElement.style.visibility = '';
+          if (hadPending) setTimeout(function() { doSync(false); }, 100);
+          return;
+        }
+        var serverVer = null;
+        rows.forEach(function(row) {
+          if (row.key === '__version') { serverVer = row.value; return; }
+          try { localStorage.setItem(row.key, row.value); } catch(e) {}
+        });
+        var clientVer = localStorage.getItem(VER_KEY);
+        localStorage.setItem(TS_KEY, Date.now().toString());
+        if (serverVer && serverVer !== clientVer) {
+          localStorage.setItem(VER_KEY, serverVer);
+          location.reload();
+        } else {
+          document.documentElement.style.visibility = '';
+          try { if (window.Slideshow && Slideshow.refresh) Slideshow.refresh(); } catch(e) {}
+          try { if (window.SectionAdmin && SectionAdmin.refresh) SectionAdmin.refresh(); } catch(e) {}
+          if (hadPending) setTimeout(function() { doSync(false); }, 100);
+        }
+      })
+      .catch(function() {
+        clearTimeout(fallback);
+        var hadPending = _syncPending;
+        _syncRunning = false;
+        _syncPending = false;
+        document.documentElement.style.visibility = '';
+        if (hadPending) setTimeout(function() { doSync(false); }, 100);
+      });
+    }
+
+    /* On page load: sync if cache expired */
+    var last = parseInt(localStorage.getItem(TS_KEY) || '0');
+    if (Date.now() - last >= CACHE_MS) doSync(true);
+
+    /* When admin saves it clears ntt_sb_ts — detect via storage event and auto-reload */
+    window.addEventListener('storage', function(e) {
+      if (e.key === TS_KEY && (e.newValue === null || e.newValue === '')) {
+        doSync(false);
+      }
+    });
+  })();
+  </script>
+  <!-- Activity Photo Lightbox -->
+  <div class="act-lightbox" id="actLightbox">
+    <button class="act-lb-close" id="actLbClose">✕</button>
+    <div class="act-lb-title" id="actLbTitle"></div>
+    <div class="act-lb-imgs" id="actLbImgs"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (function() {
+      var cfg = window._sbCfg;
+      if (cfg) window._sb = window.supabase.createClient(cfg.url, cfg.key);
+    })();
+  </script>
+  <script src="js/script.js?v=31"></script>
+</body>
+</html>

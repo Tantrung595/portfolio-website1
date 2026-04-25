@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Portfolio</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a14; --bg2: #0f0f1e; --card: #13132a;
+      --border: rgba(255,255,255,0.08); --txt: #e2e8f0; --txt2: #94a3b8;
+      --a1: #38bdf8; --red: #f87171; --green: #34d399; --yellow: #fbbf24;
+    }
+    body { background: var(--bg); color: var(--txt); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+
+    /* Login */
+    #loginScreen { display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .login-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2.5rem; width:360px; }
+    .login-card h1 { font-size:1.4rem; margin-bottom:0.3rem; }
+    .login-card p { color:var(--txt2); font-size:0.88rem; margin-bottom:2rem; }
+    .ff { margin-bottom:1rem; }
+    .ff label { display:block; font-size:0.78rem; color:var(--txt2); margin-bottom:0.4rem; }
+    .ff input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; padding:0.65rem 0.9rem; color:var(--txt); font-size:0.9rem; outline:none; }
+    .ff input:focus { border-color:rgba(56,189,248,0.5); }
+    .btn-primary { width:100%; background:var(--a1); color:#000; font-weight:700; border:none; border-radius:8px; padding:0.75rem; font-size:0.9rem; cursor:pointer; margin-top:0.5rem; }
+    .btn-primary:hover { opacity:0.85; }
+    .login-error { color:var(--red); font-size:0.82rem; margin-top:0.6rem; display:none; }
+
+    /* Dashboard */
+    #dashboard { display:none; min-height:100vh; }
+    .dash-header { background:var(--bg2); border-bottom:1px solid var(--border); padding:0.9rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+    .dash-header h1 { font-size:1rem; font-weight:700; }
+    .dash-header span { color:var(--txt2); font-size:0.8rem; margin-left:0.6rem; }
+    .btn-logout { background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.3); color:var(--red); border-radius:8px; padding:0.38rem 0.85rem; font-size:0.8rem; cursor:pointer; }
+    .btn-logout:hover { background:rgba(248,113,113,0.22); }
+
+    .dash-body { display:flex; }
+    .dash-nav { width:195px; min-height:calc(100vh - 53px); background:var(--bg2); border-right:1px solid var(--border); padding:0.75rem 0; flex-shrink:0; overflow-y:auto; }
+    .nav-group { font-size:0.68rem; color:var(--txt2); text-transform:uppercase; letter-spacing:0.06em; padding:0.8rem 1.2rem 0.3rem; }
+    .nav-item { display:flex; align-items:center; gap:0.55rem; padding:0.6rem 1.2rem; cursor:pointer; font-size:0.86rem; color:var(--txt2); transition:all 0.15s; border-left:2px solid transparent; }
+    .nav-item:hover { color:var(--txt); background:rgba(255,255,255,0.03); }
+    .nav-item.active { color:var(--a1); border-left-color:var(--a1); background:rgba(56,189,248,0.05); }
+
+    .dash-content { flex:1; padding:1.75rem 2rem; max-width:880px; overflow-y:auto; }
+    .section { display:none; }
+    .section.active { display:block; }
+    .sec-title { font-size:1.1rem; font-weight:700; margin-bottom:1.4rem; }
+
+    /* Cards */
+    .acard { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.3rem; margin-bottom:1.1rem; }
+    .acard h3 { font-size:0.8rem; color:var(--txt2); margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Fields */
+    .field { margin-bottom:0.85rem; }
+    .field label { display:block; font-size:0.74rem; color:var(--txt2); margin-bottom:0.3rem; text-transform:uppercase; letter-spacing:0.04em; }
+    .field input, .field textarea, .field select {
+      width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border);
+      border-radius:8px; padding:0.55rem 0.75rem; color:var(--txt); font-size:0.87rem;
+      outline:none; font-family:inherit; transition:border-color 0.2s; resize:vertical;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color:rgba(56,189,248,0.4); }
+    .field select option { background:var(--card); }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+
+    /* Buttons */
+    .btn { display:inline-flex; align-items:center; gap:0.4rem; border-radius:8px; padding:0.45rem 0.95rem; font-size:0.83rem; cursor:pointer; border:1px solid; transition:all 0.18s; font-family:inherit; }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-save { background:rgba(56,189,248,0.1); border-color:rgba(56,189,248,0.4); color:var(--a1); }
+    .btn-save:hover:not(:disabled) { background:rgba(56,189,248,0.2); }
+    .btn-del { background:rgba(248,113,113,0.1); border-color:rgba(248,113,113,0.3); color:var(--red); }
+    .btn-del:hover:not(:disabled) { background:rgba(248,113,113,0.2); }
+    .btn-add { background:rgba(52,211,153,0.1); border-color:rgba(52,211,153,0.3); color:var(--green); }
+    .btn-add:hover:not(:disabled) { background:rgba(52,211,153,0.2); }
+    .btn-sm { padding:0.3rem 0.65rem; font-size:0.78rem; }
+
+    /* Image upload */
+    .img-area { border:2px dashed var(--border); border-radius:10px; padding:1.2rem; text-align:center; cursor:pointer; transition:border-color 0.2s; }
+    .img-area:hover { border-color:rgba(56,189,248,0.4); }
+    .img-area img { max-height:140px; max-width:100%; border-radius:8px; margin-bottom:0.4rem; display:none; }
+    .img-area p { color:var(--txt2); font-size:0.8rem; }
+
+    /* List items */
+    .list-item { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; margin-bottom:0.65rem; display:flex; align-items:center; gap:0.9rem; }
+    .li-thumb { width:52px; height:52px; object-fit:cover; border-radius:7px; flex-shrink:0; background:rgba(255,255,255,0.05); }
+    .li-icon { width:52px; height:52px; border-radius:7px; flex-shrink:0; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+    .li-info { flex:1; min-width:0; }
+    .li-info strong { display:block; font-size:0.88rem; }
+    .li-info span { font-size:0.75rem; color:var(--txt2); }
+    .li-actions { display:flex; gap:0.45rem; flex-shrink:0; }
+
+    /* Gallery */
+    .gal-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.7rem; margin-top:0.8rem; }
+    .gal-item { position:relative; }
+    .gal-item img { width:100%; height:110px; object-fit:cover; border-radius:8px; border:1px solid var(--border); display:block; }
+    .gal-actions { position:absolute; bottom:4px; left:0; right:0; display:flex; justify-content:center; gap:4px; opacity:0; transition:opacity 0.18s; }
+    .gal-item:hover .gal-actions { opacity:1; }
+    .gal-del, .gal-move { background:rgba(0,0,0,0.72); color:#fff; border:none; border-radius:4px; padding:3px 7px; cursor:pointer; font-size:0.73rem; }
+    .gal-del { color:var(--red); }
+    .gal-move:disabled { opacity:0.3; cursor:default; }
+
+    /* Toggle */
+    .toggle-list { display:flex; flex-direction:column; gap:0.6rem; }
+    .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1rem; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:8px; }
+    .toggle-row span { font-size:0.88rem; }
+    .toggle { position:relative; width:38px; height:22px; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:rgba(255,255,255,0.15); border-radius:22px; cursor:pointer; transition:background 0.2s; }
+    .toggle-slider:before { content:''; position:absolute; height:16px; width:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:transform 0.2s; }
+    .toggle input:checked + .toggle-slider { background:var(--a1); }
+    .toggle input:checked + .toggle-slider:before { transform:translateX(16px); }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.72); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.5rem; width:500px; max-width:95vw; max-height:88vh; overflow-y:auto; }
+    .modal h3 { margin-bottom:1.2rem; font-size:1rem; }
+    .modal-actions { display:flex; gap:0.7rem; margin-top:1.2rem; justify-content:flex-end; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%); background:var(--green); color:#000; padding:0.6rem 1.5rem; border-radius:8px; font-weight:700; font-size:0.88rem; z-index:9999; pointer-events:none; opacity:0; transition:opacity 0.3s; white-space:nowrap; }
+    .toast.show { opacity:1; }
+    .toast.err { background:var(--red); color:#fff; }
+
+    .empty-msg { color:var(--txt2); font-size:0.86rem; padding:1.5rem; text-align:center; background:rgba(255,255,255,0.02); border-radius:10px; border:1px dashed var(--border); }
+    .badge { display:inline-block; padding:0.15rem 0.5rem; border-radius:20px; font-size:0.7rem; font-weight:600; }
+    .badge-tech { background:rgba(56,189,248,0.15); color:var(--a1); }
+    .badge-biz { background:rgba(139,92,246,0.15); color:#a78bfa; }
+
+    /* Project grid */
+    .proj-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; }
+    .proj-card { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:border-color 0.2s; }
+    .proj-card:hover { border-color:rgba(56,189,248,0.3); }
+    .proj-card-img { position:relative; height:150px; background:rgba(255,255,255,0.04); }
+    .proj-card-img img { width:100%; height:100%; object-fit:cover; }
+    .proj-card-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+    .proj-card-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; gap:0.5rem; opacity:0; transition:opacity 0.2s; }
+    .proj-card:hover .proj-card-overlay { opacity:1; }
+    .proj-order { position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.6); color:var(--txt2); font-size:0.72rem; padding:2px 7px; border-radius:20px; }
+    .proj-card-body { padding:1rem; }
+    .proj-card-title { font-size:0.92rem; font-weight:700; margin-bottom:0.35rem; }
+    .proj-card-desc { font-size:0.78rem; color:var(--txt2); margin-bottom:0.6rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .proj-card-tags { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem; }
+    .proj-tag { background:rgba(56,189,248,0.1); color:var(--a1); border-radius:20px; padding:0.1rem 0.5rem; font-size:0.7rem; }
+    .proj-link { font-size:0.75rem; color:var(--txt2); text-decoration:none; }
+    .proj-link:hover { color:var(--a1); }
+    .act-photo-grid { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.6rem; }
+    .act-photo-thumb { position:relative; width:75px; height:56px; border-radius:6px; overflow:hidden; border:1px solid var(--border); }
+    .act-photo-thumb img { width:100%; height:100%; object-fit:cover; }
+    .act-photo-thumb-del { position:absolute; top:2px; right:2px; width:16px; height:16px; border-radius:50%; background:rgba(239,68,68,0.9); border:none; color:#fff; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+    .act-photo-panel { border:1px dashed var(--border); border-radius:10px; padding:1rem; margin-top:0.4rem; background:rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>🔐 Admin Panel</h1>
+    <p>Đăng nhập để chỉnh sửa portfolio</p>
+    <div class="ff"><label>Mật khẩu</label><input type="password" id="loginPw" placeholder="••••••••" autocomplete="current-password" autofocus></div>
+    <button class="btn-primary" id="loginBtn">Đăng nhập</button>
+    <div class="login-error" id="loginErr">Email hoặc mật khẩu không đúng</div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <div class="dash-header">
+    <h1>Portfolio Admin<span id="userLabel"></span></h1>
+    <button class="btn-logout" id="logoutBtn">Đăng xuất</button>
+  </div>
+  <div class="dash-body">
+    <nav class="dash-nav">
+      <div class="nav-group">Cơ bản</div>
+      <div class="nav-item active" data-tab="profile">👤 Hồ sơ</div>
+      <div class="nav-item" data-tab="content">📝 Nội dung</div>
+      <div class="nav-item" data-tab="gallery">🖼️ Thư viện ảnh</div>
+      <div class="nav-group">Chuyên môn</div>
+      <div class="nav-item" data-tab="skills">💡 Kỹ năng</div>
+      <div class="nav-item" data-tab="exp">💼 Kinh nghiệm</div>
+      <div class="nav-item" data-tab="projects">🚀 Dự án</div>
+      <div class="nav-group">Học vấn</div>
+      <div class="nav-item" data-tab="edu">🎓 Học vấn</div>
+      <div class="nav-item" data-tab="certs">🏆 Bằng cấp</div>
+      <div class="nav-item" data-tab="acts">🌱 Hoạt động</div>
+      <div class="nav-group">Khác</div>
+      <div class="nav-item" data-tab="contact">📞 Liên hệ</div>
+      <div class="nav-item" data-tab="music">🎵 Nhạc nền</div>
+      <div class="nav-item" data-tab="settings">⚙️ Cài đặt</div>
+    </nav>
+
+    <div class="dash-content">
+
+      <!-- PROFILE -->
+      <div class="section active" id="tab-profile">
+        <div class="sec-title">Hồ sơ cá nhân</div>
+        <div class="acard">
+          <h3>Ảnh đại diện</h3>
+          <div class="img-area" id="profileArea"><img id="profilePrev"><p id="profileHint">📷 Nhấn để chọn ảnh</p></div>
+          <input type="file" id="profileFile" accept="image/*" style="display:none">
+          <div style="margin-top:1rem"><button class="btn btn-save" id="saveProfileBtn">💾 Lưu ảnh đại diện</button></div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="section" id="tab-content">
+        <div class="sec-title">Nội dung trang</div>
+        <div class="acard">
+          <h3>Thông tin hero</h3>
+          <div class="field-row">
+            <div class="field"><label>Tên hiển thị</label><input id="cName" placeholder="Nguyen Tan Trung"></div>
+            <div class="field"><label>Chức danh</label><input id="cTitle" placeholder="Full Stack Developer"></div>
+          </div>
+          <div class="field"><label>Tagline / Slogan</label><input id="cTagline" placeholder="Building things that matter"></div>
+          <div class="field"><label>Giới thiệu bản thân (About)</label><textarea id="cAbout" rows="6" placeholder="Viết về bản thân..."></textarea></div>
+          <button class="btn btn-save" id="saveContentBtn">💾 Lưu nội dung</button>
+        </div>
+        <div class="acard">
+          <h3>Thẻ giới thiệu (About Cards)</h3>
+          <button class="btn btn-add btn-sm" style="margin-bottom:1rem" onclick="openSecModal('about',null)">+ Thêm thẻ</button>
+          <div id="aboutList"></div>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div class="section" id="tab-gallery">
+        <div class="sec-title">Thư viện ảnh</div>
+        <div class="acard">
+          <h3>Upload ảnh mới <span id="galleryCount" style="font-weight:400;font-size:0.85rem;color:var(--muted);margin-left:0.5rem"></span></h3>
+          <input type="file" id="galleryFile" accept="image/*" multiple style="display:none">
+          <button class="btn btn-add" id="galleryAddBtn">📷 Chọn ảnh để upload</button>
+          <p style="margin:0.5rem 0 0;font-size:0.82rem;color:var(--muted)">Hover vào ảnh để sắp xếp (↑↓) hoặc xóa (✕)</p>
+        </div>
+        <div class="gal-grid" id="galleryGrid"></div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="section" id="tab-skills">
+        <div class="sec-title">Kỹ năng</div>
+        <div class="acard">
+          <h3>Kỹ năng kỹ thuật (Technical Skills)</h3>
+          <button class="btn btn-add btn-sm" style="margin-bottom:1rem" onclick="openSecModal('skillTech',null)">+ Thêm skill</button>
+          <div id="skillTechList"></div>
+        </div>
+        <div class="acard">
+          <h3>Kỹ năng nghiệp vụ (Business Skills)</h3>
+          <button class="btn btn-add btn-sm" style="margin-bottom:1rem" onclick="openSecModal('skillBiz',null)">+ Thêm skill</button>
+          <div id="skillBizList"></div>
+        </div>
+      </div>
+
+      <!-- EXPERIENCE -->
+      <div class="section" id="tab-exp">
+        <div class="sec-title">Kinh nghiệm làm việc</div>
+        <button class="btn btn-add" style="margin-bottom:1.2rem" onclick="openSecModal('exp',null)">+ Thêm kinh nghiệm</button>
+        <div id="expList"></div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="section" id="tab-projects">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem">
+          <div class="sec-title" style="margin-bottom:0">Dự án</div>
+          <button class="btn btn-add" id="addProjBtn">+ Thêm dự án mới</button>
+        </div>
+        <div id="projList"></div>
+      </div>
+
+      <!-- EDU -->
+      <div class="section" id="tab-edu">
+        <div class="sec-title">Học vấn</div>
+        <button class="btn btn-add" style="margin-bottom:1.2rem" onclick="openSecModal('edu',null)">+ Thêm học vấn</button>
+        <div id="eduSecList"></div>
+        <div class="acard" style="margin-top:1.5rem">
+          <h3>Ảnh bằng tốt nghiệp (cho các mục cố định)</h3>
+          <div id="eduDetailsList"></div>
+        </div>
+      </div>
+
+      <!-- CERTS -->
+      <div class="section" id="tab-certs">
+        <div class="sec-title">Bằng cấp & Chứng chỉ</div>
+        <button class="btn btn-add" style="margin-bottom:1.2rem" onclick="openSecModal('cert',null)">+ Thêm chứng chỉ</button>
+        <div id="certSecList"></div>
+        <div class="acard" style="margin-top:1.5rem">
+          <h3>Chi tiết ảnh (cho các chứng chỉ cố định)</h3>
+          <div id="certDetailsList"></div>
+        </div>
+      </div>
+
+      <!-- ACTIVITIES -->
+      <div class="section" id="tab-acts">
+        <div class="sec-title">Hoạt động & Tình nguyện</div>
+        <button class="btn btn-add" style="margin-bottom:1.2rem" onclick="openSecModal('act',null)">+ Thêm hoạt động</button>
+        <div id="actList"></div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="section" id="tab-contact">
+        <div class="sec-title">Thông tin liên hệ</div>
+        <button class="btn btn-add" style="margin-bottom:1.2rem" onclick="openSecModal('contact',null)">+ Thêm liên hệ</button>
+        <div id="contactList"></div>
+      </div>
+
+      <!-- MUSIC -->
+      <div class="section" id="tab-music">
+        <div class="sec-title">Nhạc nền</div>
+        <div class="acard">
+          <h3>Thêm bài hát</h3>
+          <p style="font-size:0.82rem;color:var(--txt2);margin-bottom:1rem">Đặt file MP3 vào thư mục <code style="background:rgba(255,255,255,0.08);padding:0.1rem 0.4rem;border-radius:4px">music/</code> rồi thêm vào đây.</p>
+          <div class="field-row">
+            <div class="field"><label>Tên bài hát</label><input id="musicTitle" placeholder="Heading Home"></div>
+            <div class="field"><label>Tên file (trong thư mục music/)</label><input id="musicSrc" placeholder="heading-home.mp3"></div>
+          </div>
+          <button class="btn btn-add" id="addMusicBtn">+ Thêm vào playlist</button>
+        </div>
+        <div id="musicList" style="margin-top:0.5rem"></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="section" id="tab-settings">
+        <div class="sec-title">Cài đặt hiển thị</div>
+        <div class="acard">
+          <h3>Cập nhật Portfolio</h3>
+          <p style="font-size:0.82rem;color:var(--txt2);margin:0 0 0.8rem">Sau khi chỉnh sửa xong, bấm nút này để Portfolio nhận dữ liệu mới ngay lập tức.</p>
+          <button class="btn btn-add" id="forceSyncBtn" onclick="forceSync()">🔄 Cập nhật ngay</button>
+          <div id="forceSyncStatus" style="font-size:0.82rem;color:var(--txt2);margin-top:0.5rem"></div>
+        </div>
+        <div class="acard">
+          <h3>Khởi tạo dữ liệu mẫu</h3>
+          <div id="autoSeedStatus" style="font-size:0.85rem;color:var(--txt2);margin-bottom:0.8rem">⏳ Đang kiểm tra...</div>
+          <button class="btn btn-add" id="seedBtn" style="display:none">🔄 Đồng bộ thủ công</button>
+          <span id="seedStatus" style="font-size:0.82rem;color:var(--txt2);margin-left:1rem"></span>
+        </div>
+        <div class="acard">
+          <h3>Hiển thị các phần trang</h3>
+          <div class="toggle-list" id="sectionToggles"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Generic Section Item Modal -->
+<div class="modal-overlay" id="secModal">
+  <div class="modal">
+    <h3 id="secModalTitle">Thêm / Sửa</h3>
+    <input type="hidden" id="secModalType">
+    <input type="hidden" id="secModalId">
+    <div id="secModalBody"></div>
+    <div class="modal-actions">
+      <button class="btn btn-del" id="secCancelBtn">Hủy</button>
+      <button class="btn btn-save" id="secSaveBtn">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cert Details Modal -->
+<div class="modal-overlay" id="certDetModal">
+  <div class="modal">
+    <h3 id="certDetTitle">Chi tiết bằng cấp</h3>
+    <input type="hidden" id="certDetId">
+    <div class="field"><label>Ảnh bằng cấp</label>
+      <div class="img-area" id="certDetArea"><img id="certDetPrev"><p id="certDetHint">📷 Nhấn để chọn ảnh</p></div>
+      <input type="file" id="certDetFile" accept="image/*" style="display:none">
+    </div>
+    <div class="field"><label>Mô tả</label><textarea id="certDetDesc" rows="2"></textarea></div>
+    <div class="field"><label>Link xác minh</label><input id="certDetLink" type="url" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-del" id="certDetCancel">Hủy</button>
+      <button class="btn btn-save" id="certDetSave">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edu Details Modal -->
+<div class="modal-overlay" id="eduDetModal">
+  <div class="modal">
+    <h3 id="eduDetTitle">Chi tiết học vấn</h3>
+    <input type="hidden" id="eduDetId">
+    <div class="field"><label>Ảnh bằng tốt nghiệp</label>
+      <div class="img-area" id="eduDetArea"><img id="eduDetPrev"><p id="eduDetHint">📷 Nhấn để chọn ảnh</p></div>
+      <input type="file" id="eduDetFile" accept="image/*" style="display:none">
+    </div>
+    <div class="field"><label>Thành tích / Luận văn</label><textarea id="eduDetAchieve" rows="2"></textarea></div>
+    <div class="field"><label>Link xác minh</label><input id="eduDetLink" type="url" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-del" id="eduDetCancel">Hủy</button>
+      <button class="btn btn-save" id="eduDetSave">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- Project Modal -->
+<div class="modal-overlay" id="projModal">
+  <div class="modal" style="width:560px">
+    <h3 id="projModalTitle">Dự án</h3>
+    <input type="hidden" id="projEditId">
+    <div class="field"><label>Tiêu đề dự án *</label><input id="projTitle" placeholder="Tên dự án nổi bật"></div>
+    <div class="field"><label>Mô tả ngắn</label><textarea id="projDesc" rows="3" placeholder="Mô tả ngắn gọn về dự án, công nghệ sử dụng, kết quả đạt được..."></textarea></div>
+    <div class="field-row">
+      <div class="field"><label>Tags (phân cách bằng phẩy)</label><input id="projTags" placeholder="React, Node.js, MongoDB"></div>
+      <div class="field"><label>Link GitHub / Demo</label><input id="projLink" type="url" placeholder="https://github.com/..."></div>
+    </div>
+    <div class="field"><label>Ảnh thumbnail dự án</label>
+      <div class="img-area" id="projImgArea"><img id="projImgPrev"><p id="projImgHint">📷 Nhấn để chọn ảnh (khuyến nghị 16:9)</p></div>
+      <input type="file" id="projImgFile" accept="image/*" style="display:none">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-del" id="projCancelBtn">Hủy</button>
+      <button class="btn btn-save" id="projSaveBtn">💾 Lưu dự án</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SURL   = 'https://ryqmjaxmlksdbxzilwgs.supabase.co';
+const SKEY   = 'sb_publishable_RQiKqaEcZaDIoc8s45r_lg_Vkrw-EDI';
+const BUCKET = 'portfolio-images1';
+const sb     = window.supabase.createClient(SURL, SKEY);
+
+/* ── Section configs ── */
+const SEC_CFG = {
+  about:     { key:'ntt_sec_about',   label:'Thẻ giới thiệu',    icon:'ℹ️'  },
+  edu:       { key:'ntt_sec_edu',     label:'Học vấn (dynamic)', icon:'🎓'  },
+  skillTech: { key:'ntt_sec_st',      label:'Kỹ năng kỹ thuật',  icon:'💡'  },
+  skillBiz:  { key:'ntt_sec_sb',      label:'Kỹ năng nghiệp vụ', icon:'📊'  },
+  exp:       { key:'ntt_sec_exp',     label:'Kinh nghiệm',        icon:'💼'  },
+  cert:      { key:'ntt_sec_cert',    label:'Chứng chỉ (dynamic)',icon:'🏆'  },
+  act:       { key:'ntt_sec_act',     label:'Hoạt động',          icon:'🌱'  },
+  contact:   { key:'ntt_sec_contact', label:'Liên hệ',            icon:'📞'  },
+};
+
+const CERT_META = [
+  { id:'topik', icon:'🇰🇷', name:'TOPIK 4급' },
+  { id:'ai',    icon:'🤖', name:'AI Expert 1급' },
+  { id:'sns',   icon:'📱', name:'SNS Marketing 1급' },
+  { id:'kiip',  icon:'🏛️', name:'KIIP' },
+];
+const EDU_META = [
+  { id:'mba',        icon:'🎓', name:'MBA — Soongsil University' },
+  { id:'korean',     icon:'🇰🇷', name:'Korean — Kwangwoon University' },
+  { id:'bachelor',   icon:'💻', name:'IT — IUH Ho Chi Minh' },
+  { id:'highschool', icon:'🏫', name:'Hoang Van Thu High School' },
+];
+
+const SEC_FORMS = {
+  about: [
+    { id:'icon',  label:'Icon (emoji)', type:'text',   ph:'🎓' },
+    { id:'title', label:'Tiêu đề',      type:'text',   ph:'MBA · GPA 4.3', req:true },
+    { id:'sub',   label:'Phụ đề',       type:'text',   ph:'Soongsil University' },
+  ],
+  skillTech: [
+    { id:'name',  label:'Tên kỹ năng',  type:'text',   ph:'React',  req:true },
+    { id:'level', label:'Level (0–100)',type:'number', ph:'80',     req:true },
+    { id:'icon',  label:'Icon — URL ảnh hoặc emoji',  type:'text',   ph:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg' },
+  ],
+  skillBiz: [
+    { id:'name',  label:'Tên kỹ năng',  type:'text',   ph:'Excel',  req:true },
+    { id:'level', label:'Level (0–100)',type:'number', ph:'90',     req:true },
+    { id:'icon',  label:'Icon — URL ảnh hoặc emoji',  type:'text',   ph:'🧩 hoặc https://...' },
+  ],
+  exp: [
+    { id:'period', label:'Thời gian',        type:'text',     ph:'2023.01 — 2024.06', req:true },
+    { id:'icon',   label:'Icon (emoji)',      type:'text',     ph:'💼' },
+    { id:'title',  label:'Chức vụ',           type:'text',     ph:'IT Consultant',     req:true },
+    { id:'org',    label:'Công ty/Tổ chức',   type:'text',     ph:'Company Name' },
+    { id:'desc',   label:'Mô tả (mỗi dòng = 1 ý)',type:'textarea', ph:'Phụ trách...\nQuản lý...', rows:4 },
+    { id:'tags',   label:'Tags (phân cách phẩy)',  type:'text',     ph:'Python, SQL, Excel' },
+  ],
+  cert: [
+    { id:'icon',        label:'Icon (emoji)',     type:'text',     ph:'🏆' },
+    { id:'score',       label:'Điểm / Cấp độ',   type:'text',     ph:'95점 / 1급' },
+    { id:'name',        label:'Tên chứng chỉ',   type:'text',     ph:'TOPIK',  req:true },
+    { id:'org',         label:'Tổ chức cấp',      type:'text',     ph:'National Institute' },
+    { id:'date',        label:'Ngày cấp',          type:'text',     ph:'2024.11.28' },
+    { id:'description', label:'Mô tả (tùy chọn)', type:'textarea', ph:'Ghi chú...', rows:2 },
+    { id:'link',        label:'Link xác minh',    type:'text',     ph:'https://...' },
+  ],
+  act: [
+    { id:'icon',   label:'Icon (emoji)',    type:'text',     ph:'🌱' },
+    { id:'period', label:'Thời gian',       type:'text',     ph:'2025.01 — 2025.06', req:true },
+    { id:'title',  label:'Tên hoạt động',   type:'text',     ph:'Tình nguyện viên',  req:true },
+    { id:'org',    label:'Tổ chức',         type:'text',     ph:'Organization' },
+    { id:'desc',   label:'Mô tả',           type:'textarea', ph:'Chi tiết hoạt động...', rows:3 },
+    { id:'status', label:'Trạng thái',      type:'select',   opts:['Ongoing','Completed'] },
+  ],
+  edu: [
+    { id:'year',     label:'Năm học',     type:'text',     ph:'2020 — 2024',      req:true },
+    { id:'icon',     label:'Icon (emoji)',type:'text',     ph:'🎓' },
+    { id:'badge',    label:'Badge',       type:'text',     ph:"Bachelor's" },
+    { id:'degree',   label:'Bằng / Chương trình', type:'text', ph:'Bachelor of Science', req:true },
+    { id:'school',   label:'Trường',      type:'text',     ph:'University Name',  req:true },
+    { id:'location', label:'Địa điểm',    type:'text',     ph:'Seoul, Korea' },
+    { id:'desc',     label:'Mô tả',       type:'textarea', ph:'Mô tả ngắn...', rows:3 },
+  ],
+  contact: [
+    { id:'icon',  label:'Icon (emoji)',   type:'text', ph:'📧' },
+    { id:'label', label:'Nhãn',           type:'text', ph:'Gmail',              req:true },
+    { id:'value', label:'Giá trị hiển thị',type:'text',ph:'name@gmail.com',    req:true },
+    { id:'href',  label:'Link (href)',    type:'text', ph:'mailto:name@gmail.com' },
+  ],
+};
+
+/* ── Toast ── */
+function toast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (err?' err':'');
+  clearTimeout(t._t); t._t = setTimeout(() => t.className='toast', 3000);
+}
+
+/* ── DB helpers ── */
+async function dbGet(key) {
+  const { data, error } = await sb.from('portfolio_data').select('value').eq('key', key).maybeSingle();
+  if (error) { console.error('[admin] dbGet lỗi key='+key+':', error.message||error); throw error; }
+  if (!data) return null;
+  try { return JSON.parse(data.value); } catch { return data.value; }
+}
+async function dbSet(key, value) {
+  const str = typeof value === 'string' ? value : JSON.stringify(value);
+  const { error } = await sb.from('portfolio_data').upsert({ key, value: str, updated_at: new Date().toISOString() }, { onConflict:'key' });
+  if (error) throw error;
+  await sb.from('portfolio_data').upsert({ key:'__version', value:Date.now().toString(), updated_at:new Date().toISOString() }, { onConflict:'key' });
+  localStorage.removeItem('ntt_sb_ts');
+}
+
+/* ── Storage ── */
+async function uploadFile(file, path) {
+  const { error } = await sb.storage.from(BUCKET).upload(path, file, { cacheControl:'3600', upsert:true });
+  if (error) throw error;
+  return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+/* ── Image uploader helper ── */
+function makeUp(areaId, prevId, hintId, fileId) {
+  const area=document.getElementById(areaId), prev=document.getElementById(prevId),
+        hint=document.getElementById(hintId), inp=document.getElementById(fileId);
+  let _f=null;
+  area.addEventListener('click', ()=>inp.click());
+  inp.addEventListener('change', e=>{
+    const f=e.target.files[0]; if(!f) return;
+    _f=f; prev.src=URL.createObjectURL(f); prev.style.display='block'; hint.style.display='none';
+  });
+  return {
+    getFile:()=>_f,
+    setUrl:url=>{ if(url){prev.src=url;prev.style.display='block';hint.style.display='none';}else{prev.style.display='none';hint.style.display='';} },
+    reset:()=>{ _f=null; prev.src=''; prev.style.display='none'; hint.style.display=''; inp.value=''; }
+  };
+}
+
+/* ── Auth (simple password) ── */
+const ADMIN_PASS = '190399';
+
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('loginPw').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+
+function doLogin() {
+  const pw = document.getElementById('loginPw').value;
+  const errEl = document.getElementById('loginErr');
+  if(pw === ADMIN_PASS) {
+    sessionStorage.setItem('ntt_admin','1');
+    showDash();
+  } else {
+    errEl.textContent = 'Mật khẩu không đúng';
+    errEl.style.display = 'block';
+  }
+}
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  sessionStorage.removeItem('ntt_admin');
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+});
+async function showDash() {
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  await autoSeed(); // seed trước (nếu cần), rồi mới load
+  loadAll();
+}
+if(sessionStorage.getItem('ntt_admin')==='1') showDash();
+
+/* ── Nav ── */
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('tab-'+item.dataset.tab).classList.add('active');
+  });
+});
+
+function loadAll() {
+  loadProfile(); loadContent(); loadGallery();
+  loadSecItems('skillTech'); loadSecItems('skillBiz');
+  loadSecItems('exp'); loadSecItems('act'); loadSecItems('about');
+  loadSecItems('cert'); loadSecItems('edu'); loadSecItems('contact');
+  loadCertDetails(); loadEduDetails(); loadProjects(); loadMusic(); loadSettings();
+  loadActPhotos();
+}
+
+/* ═══════════════════════════════ PROFILE ═══════════════════════════════ */
+const profileUp = makeUp('profileArea','profilePrev','profileHint','profileFile');
+async function loadProfile() {
+  const url = await dbGet('ntt_profile_photo'); if(url) profileUp.setUrl(url);
+}
+document.getElementById('saveProfileBtn').addEventListener('click', async()=>{
+  const file=profileUp.getFile(); if(!file){ toast('Chưa chọn ảnh',true); return; }
+  const btn=document.getElementById('saveProfileBtn'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    const url=await uploadFile(file,'profile/avatar.'+file.name.split('.').pop());
+    await dbSet('ntt_profile_photo', url); toast('✅ Đã lưu ảnh đại diện!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='💾 Lưu ảnh đại diện'; btn.disabled=false;
+});
+
+/* ═══════════════════════════════ CONTENT ═══════════════════════════════ */
+async function loadContent() {
+  const c=await dbGet('ntt_content')||{};
+  document.getElementById('cName').value    = c.heroName    ||'';
+  document.getElementById('cTitle').value   = c.heroTitle   ||'';
+  document.getElementById('cTagline').value = c.heroTagline ||'';
+  document.getElementById('cAbout').value   = c.about       ||'';
+}
+document.getElementById('saveContentBtn').addEventListener('click', async()=>{
+  const btn=document.getElementById('saveContentBtn'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    const existing=await dbGet('ntt_content')||{};
+    await dbSet('ntt_content', { ...existing,
+      heroName:document.getElementById('cName').value.trim(),
+      heroTitle:document.getElementById('cTitle').value.trim(),
+      heroTagline:document.getElementById('cTagline').value.trim(),
+      about:document.getElementById('cAbout').value.trim(),
+    }); toast('✅ Đã lưu nội dung!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='💾 Lưu nội dung'; btn.disabled=false;
+});
+
+/* ═══════════════════════════════ GALLERY ═══════════════════════════════ */
+let gallery=[];
+async function loadGallery() {
+  gallery=await dbGet('ntt_gallery_photos')||[]; renderGallery();
+}
+function renderGallery() {
+  var countEl = document.getElementById('galleryCount');
+  if (countEl) countEl.textContent = gallery.length ? '('+gallery.length+' ảnh)' : '';
+  document.getElementById('galleryGrid').innerHTML = gallery.map((url,i)=>
+    `<div class="gal-item">
+      <img src="${url}">
+      <div class="gal-actions">
+        <button class="gal-move" onclick="moveGallery(${i},-1)" title="Lên" ${i===0?'disabled':''}>↑</button>
+        <button class="gal-move" onclick="moveGallery(${i},1)" title="Xuống" ${i===gallery.length-1?'disabled':''}>↓</button>
+        <button class="gal-del" onclick="delGallery(${i})">✕</button>
+      </div>
+    </div>`
+  ).join('');
+}
+async function moveGallery(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= gallery.length) return;
+  [gallery[idx], gallery[newIdx]] = [gallery[newIdx], gallery[idx]];
+  await dbSet('ntt_gallery_photos', gallery); renderGallery(); toast('Đã sắp xếp');
+}
+document.getElementById('galleryAddBtn').addEventListener('click',()=>document.getElementById('galleryFile').click());
+document.getElementById('galleryFile').addEventListener('change', async e=>{
+  const files=Array.from(e.target.files); if(!files.length) return;
+  const btn=document.getElementById('galleryAddBtn'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    for(const f of files){ const url=await uploadFile(f,'gallery/'+Date.now()+'_'+f.name.replace(/\s/g,'_')); gallery.push(url); }
+    await dbSet('ntt_gallery_photos',gallery); renderGallery(); toast('✅ Đã thêm ảnh!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='📷 Chọn ảnh để upload'; btn.disabled=false; e.target.value='';
+});
+async function delGallery(idx) {
+  if(!confirm('Xóa ảnh này?')) return;
+  gallery.splice(idx,1); await dbSet('ntt_gallery_photos',gallery); renderGallery(); toast('Đã xóa');
+}
+
+/* ═══════════════════════════════ GENERIC SECTION CRUD ═══════════════════════════════ */
+let secData = {};
+
+let actPhotoData = {};
+
+async function loadActPhotos() {
+  actPhotoData = await dbGet('ntt_act_details') || {};
+}
+
+async function saveActPhotos() {
+  await dbSet('ntt_act_details', actPhotoData);
+}
+
+function openActPhotoPanel(actId) {
+  const listEl = document.getElementById('actList');
+  const existing = document.getElementById('act-photo-panel-'+actId);
+  if (existing) { existing.remove(); return; }
+  const item = (secData['act']||[]).find(x=>String(x.id)===String(actId));
+  const title = item ? item.title : actId;
+  const images = (actPhotoData[actId]||{}).images||[];
+  const panel = document.createElement('div');
+  panel.id = 'act-photo-panel-'+actId;
+  panel.className = 'act-photo-panel';
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.7rem">
+      <strong style="font-size:0.85rem">📸 Ảnh: ${esc(title)}</strong>
+      <button class="btn btn-sm" onclick="document.getElementById('act-photo-panel-${esc(actId)}').remove()">✕</button>
+    </div>
+    <div class="act-photo-grid" id="act-photo-grid-${esc(actId)}">
+      ${images.map((url,i)=>`<div class="act-photo-thumb"><img src="${esc(url)}" alt=""><button class="act-photo-thumb-del" onclick="delActPhoto('${esc(actId)}',${i})">✕</button></div>`).join('')}
+    </div>
+    <label class="btn btn-add" style="cursor:pointer;margin-top:0.5rem;display:inline-flex;align-items:center;gap:0.4rem;font-size:0.82rem">
+      📷 Thêm ảnh
+      <input type="file" accept="image/*" multiple style="display:none" onchange="addActPhotos('${esc(actId)}',this)">
+    </label>
+    <span id="act-photo-status-${esc(actId)}" style="font-size:0.78rem;color:var(--txt2);margin-left:0.8rem"></span>
+  `;
+  const itemEls = listEl.querySelectorAll('.list-item');
+  let target = null;
+  itemEls.forEach(el => { if (el.querySelector(`[onclick*="'${actId}'"]`)) target = el; });
+  if (target) target.insertAdjacentElement('afterend', panel);
+  else listEl.appendChild(panel);
+}
+
+async function addActPhotos(actId, input) {
+  const status = document.getElementById('act-photo-status-'+actId);
+  if (!actPhotoData[actId]) actPhotoData[actId] = { images: [] };
+  if (!actPhotoData[actId].images) actPhotoData[actId].images = [];
+  if (status) { status.textContent = 'Đang upload...'; status.style.color = 'var(--txt2)'; }
+  try {
+    for (const file of Array.from(input.files)) {
+      const url = await uploadFile(file, 'act/'+actId+'/'+Date.now()+'_'+file.name.replace(/\s/g,'_'));
+      if (url) actPhotoData[actId].images.push(url);
+    }
+    await saveActPhotos();
+    const grid = document.getElementById('act-photo-grid-'+actId);
+    if (grid) {
+      const imgs = actPhotoData[actId].images;
+      grid.innerHTML = imgs.map((url,i)=>
+        `<div class="act-photo-thumb"><img src="${esc(url)}" alt=""><button class="act-photo-thumb-del" onclick="delActPhoto('${esc(actId)}',${i})">✕</button></div>`
+      ).join('');
+    }
+    const s = document.getElementById('act-photo-status-'+actId);
+    if (s) { s.textContent = '✅ Đã upload '+actPhotoData[actId].images.length+' ảnh'; s.style.color = ''; }
+  } catch(e) {
+    const s = document.getElementById('act-photo-status-'+actId);
+    if (s) { s.textContent = '❌ Lỗi: '+e.message; s.style.color = '#ef4444'; }
+  }
+  input.value = '';
+}
+
+async function delActPhoto(actId, idx) {
+  if (!actPhotoData[actId]) return;
+  actPhotoData[actId].images.splice(idx, 1);
+  await saveActPhotos();
+  const grid = document.getElementById('act-photo-grid-'+actId);
+  if (grid) {
+    const imgs = actPhotoData[actId].images;
+    grid.innerHTML = imgs.map((url,i)=>
+      `<div class="act-photo-thumb"><img src="${esc(url)}" alt=""><button class="act-photo-thumb-del" onclick="delActPhoto('${esc(actId)}',${i})">✕</button></div>`
+    ).join('');
+  }
+}
+
+async function loadSecItems(sec) {
+  const key = SEC_CFG[sec].key;
+  try {
+    let data = await dbGet(key);
+    // Nếu Supabase trả về rỗng nhưng SEED có dữ liệu → lazy seed (ghi lại)
+    if ((!data || (Array.isArray(data) && data.length === 0)) && SEED[key] && SEED[key].length > 0) {
+      console.log('[admin] lazy seed:', key);
+      await dbSet(key, SEED[key]);
+      data = SEED[key];
+    }
+    secData[sec] = data || [];
+  } catch(e) {
+    console.error('[admin] loadSecItems', sec, e);
+    // Fallback sang SEED nếu Supabase lỗi
+    secData[sec] = (SEED[key] || []).slice();
+    toast('⚠️ Lỗi kết nối Supabase — hiển thị dữ liệu mặc định', true);
+  }
+  renderSecList(sec);
+}
+
+function renderSecList(sec) {
+  const listIds = { about:'aboutList', skillTech:'skillTechList', skillBiz:'skillBizList',
+    exp:'expList', cert:'certSecList', act:'actList', edu:'eduSecList', contact:'contactList' };
+  const el=document.getElementById(listIds[sec]); if(!el) return;
+  const items=secData[sec]||[];
+  if(!items.length){ el.innerHTML='<div class="empty-msg">Chưa có mục nào</div>'; return; }
+  el.innerHTML = items.map(item=>{
+    const title = item.title||item.name||item.label||item.degree||'(không có tên)';
+    const sub   = item.sub||item.org||item.period||item.value||item.score||'';
+    const icon  = item.icon||'';
+    const isUrl = icon.startsWith('http');
+    const iconHtml = isUrl
+      ? `<img src="${esc(icon)}" style="width:32px;height:32px;object-fit:contain;border-radius:4px">`
+      : `<span style="font-size:1.4rem">${icon||'•'}</span>`;
+    const photoBtn = sec==='act' ? `<button class="btn btn-sm" onclick="openActPhotoPanel('${item.id}')" title="Quản lý ảnh">📸</button>` : '';
+    return `<div class="list-item">
+      <div class="li-icon">${iconHtml}</div>
+      <div class="li-info"><strong>${esc(title)}</strong><span>${esc(sub)}</span></div>
+      <div class="li-actions">
+        ${photoBtn}
+        <button class="btn btn-save btn-sm" onclick="openSecModal('${sec}','${item.id}')">✏️</button>
+        <button class="btn btn-del btn-sm" onclick="delSecItem('${sec}','${item.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let _secModal = { type:null, id:null, imgPending:null, actTempId:null };
+
+function openSecModal(sec, id) {
+  const fields = SEC_FORMS[sec]; if(!fields) return;
+  _secModal.type=sec; _secModal.id=id; _secModal.imgPending=null;
+  _secModal.actTempId = (sec==='act') ? (id || ('item-'+Date.now())) : null;
+  const item = id ? (secData[sec]||[]).find(x=>String(x.id)===String(id)) : null;
+  document.getElementById('secModalType').value=sec;
+  document.getElementById('secModalId').value=id||'';
+  document.getElementById('secModalTitle').textContent = (id?'Sửa':'Thêm') + ': ' + SEC_CFG[sec].label;
+  const body=document.getElementById('secModalBody');
+  body.innerHTML = fields.map(f=>{
+    if(f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea id="smf_${f.id}" rows="${f.rows||3}" placeholder="${f.ph||''}">${esc(item?.[f.id]||'')}</textarea></div>`;
+    if(f.type==='select') return `<div class="field"><label>${f.label}</label><select id="smf_${f.id}">${(f.opts||[]).map(o=>`<option value="${o}"${(item?.[f.id]||'')==o?' selected':''}>${o}</option>`).join('')}</select></div>`;
+    return `<div class="field"><label>${f.label}</label><input id="smf_${f.id}" type="${f.type||'text'}" placeholder="${f.ph||''}" value="${esc(item?.[f.id]||'')}" ${f.min!==undefined?'min='+f.min:''} ${f.max!==undefined?'max='+f.max:''}></div>`;
+  }).join('');
+  if (sec === 'act') renderActModalPhotoSection();
+  document.getElementById('secModal').classList.add('open');
+}
+
+function renderActModalPhotoSection() {
+  const body = document.getElementById('secModalBody');
+  const tid = _secModal.actTempId;
+  const photos = (actPhotoData[tid] || {}).images || [];
+  const existing = document.getElementById('actModalPhotoSection');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.className = 'field'; div.id = 'actModalPhotoSection';
+  div.innerHTML = `
+    <label>Ảnh hoạt động</label>
+    <div class="act-photo-grid" id="actModalPhotoGrid">
+      ${photos.map((url,i)=>`<div class="act-photo-thumb">
+        <img src="${esc(url)}" alt="photo">
+        <button class="act-photo-thumb-del" onclick="delActModalPhoto(${i})" title="Xóa">✕</button>
+      </div>`).join('')}
+    </div>
+    <label class="btn btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:0.4rem">
+      📷 Thêm ảnh
+      <input type="file" accept="image/*" multiple style="display:none" onchange="addActModalPhotos(this)">
+    </label>
+    <div id="actModalPhotoStatus" style="font-size:0.78rem;color:var(--txt2);margin-top:0.3rem"></div>`;
+  body.appendChild(div);
+}
+
+async function addActModalPhotos(input) {
+  const tid = _secModal.actTempId; if(!tid) return;
+  if (!actPhotoData[tid]) actPhotoData[tid] = { images: [] };
+  if (!actPhotoData[tid].images) actPhotoData[tid].images = [];
+  const statusEl = document.getElementById('actModalPhotoStatus');
+  if (statusEl) { statusEl.textContent = 'Đang upload...'; statusEl.style.color = 'var(--txt2)'; }
+  let ok = true;
+  for (const file of Array.from(input.files)) {
+    try {
+      const url = await uploadFile(file, 'act/'+tid+'/'+Date.now()+'_'+file.name.replace(/\s/g,'_'));
+      if (url) actPhotoData[tid].images.push(url);
+    } catch(e) { ok = false; if (statusEl) { statusEl.textContent = '❌ Lỗi: '+e.message; statusEl.style.color='#ef4444'; } break; }
+  }
+  input.value = '';
+  renderActModalPhotoSection();
+  const s = document.getElementById('actModalPhotoStatus');
+  if (s && ok) { s.textContent = '✅ Đã upload '+actPhotoData[tid].images.length+' ảnh'; }
+}
+
+function delActModalPhoto(idx) {
+  const tid = _secModal.actTempId; if(!tid) return;
+  if (!actPhotoData[tid]) return;
+  actPhotoData[tid].images.splice(idx, 1);
+  renderActModalPhotoSection();
+}
+
+document.getElementById('secCancelBtn').addEventListener('click',()=>document.getElementById('secModal').classList.remove('open'));
+document.getElementById('secModal').addEventListener('click',e=>{ if(e.target.id==='secModal') document.getElementById('secModal').classList.remove('open'); });
+
+document.getElementById('secSaveBtn').addEventListener('click', async()=>{
+  const sec=_secModal.type;
+  const fields=SEC_FORMS[sec]; if(!fields) return;
+  const btn=document.getElementById('secSaveBtn'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    const item={};
+    let valid=true;
+    fields.forEach(f=>{
+      const el=document.getElementById('smf_'+f.id); if(!el) return;
+      item[f.id]=el.value.trim();
+      if(f.req && !item[f.id]){ valid=false; el.style.borderColor='var(--red)'; }
+    });
+    if(!valid){ toast('Vui lòng điền đầy đủ thông tin bắt buộc',true); btn.textContent='💾 Lưu'; btn.disabled=false; return; }
+    const list=secData[sec]||[];
+    if(_secModal.id){ const idx=list.findIndex(x=>String(x.id)===String(_secModal.id)); item.id=_secModal.id; if(idx>=0) list[idx]=item; else list.push(item); }
+    else { item.id = (sec==='act' && _secModal.actTempId) ? _secModal.actTempId : ('item-'+Date.now()); list.push(item); }
+    secData[sec]=list;
+    await dbSet(SEC_CFG[sec].key, list);
+    if (sec==='act') await dbSet('ntt_act_details', actPhotoData);
+    document.getElementById('secModal').classList.remove('open');
+    renderSecList(sec); toast('✅ Đã lưu!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='💾 Lưu'; btn.disabled=false;
+});
+
+async function delSecItem(sec, id) {
+  if(!confirm('Xóa mục này?')) return;
+  secData[sec]=(secData[sec]||[]).filter(x=>String(x.id)!==String(id));
+  await dbSet(SEC_CFG[sec].key, secData[sec]);
+  renderSecList(sec); toast('Đã xóa');
+}
+
+/* ═══════════════════════════════ CERT DETAILS (static cards) ═══════════════════════════════ */
+let certDetails={};
+const certDetUp=makeUp('certDetArea','certDetPrev','certDetHint','certDetFile');
+
+async function loadCertDetails() {
+  certDetails=await dbGet('ntt_cert_details')||{};
+  document.getElementById('certDetailsList').innerHTML = CERT_META.map(c=>{
+    const d=certDetails[c.id]||{};
+    return `<div class="list-item">
+      ${d.image?`<img class="li-thumb" src="${d.image}">`:`<div class="li-icon">${c.icon}</div>`}
+      <div class="li-info"><strong>${c.name}</strong><span>${d.description||'(chưa có ảnh)'}</span></div>
+      <div class="li-actions"><button class="btn btn-save btn-sm" onclick="openCertDet('${c.id}','${c.name}')">✏️ Sửa</button></div>
+    </div>`;
+  }).join('');
+}
+function openCertDet(id,name) {
+  const d=certDetails[id]||{};
+  document.getElementById('certDetId').value=id;
+  document.getElementById('certDetTitle').textContent='Chi tiết: '+name;
+  document.getElementById('certDetDesc').value=d.description||'';
+  document.getElementById('certDetLink').value=d.link||'';
+  certDetUp.reset(); if(d.image) certDetUp.setUrl(d.image);
+  document.getElementById('certDetModal').classList.add('open');
+}
+document.getElementById('certDetCancel').addEventListener('click',()=>document.getElementById('certDetModal').classList.remove('open'));
+document.getElementById('certDetModal').addEventListener('click',e=>{ if(e.target.id==='certDetModal') document.getElementById('certDetModal').classList.remove('open'); });
+document.getElementById('certDetSave').addEventListener('click', async()=>{
+  const id=document.getElementById('certDetId').value;
+  const btn=document.getElementById('certDetSave'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    let img=(certDetails[id]||{}).image||'';
+    const file=certDetUp.getFile();
+    if(file) img=await uploadFile(file,'certs/'+id+'.'+file.name.split('.').pop());
+    certDetails[id]={ image:img, description:document.getElementById('certDetDesc').value.trim(), link:document.getElementById('certDetLink').value.trim() };
+    await dbSet('ntt_cert_details',certDetails);
+    document.getElementById('certDetModal').classList.remove('open');
+    loadCertDetails(); toast('✅ Đã lưu!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='💾 Lưu'; btn.disabled=false;
+});
+
+/* ═══════════════════════════════ EDU DETAILS (static cards) ═══════════════════════════════ */
+let eduDetails={};
+const eduDetUp=makeUp('eduDetArea','eduDetPrev','eduDetHint','eduDetFile');
+
+async function loadEduDetails() {
+  eduDetails=await dbGet('ntt_edu_details')||{};
+  document.getElementById('eduDetailsList').innerHTML = EDU_META.map(e=>{
+    const d=eduDetails[e.id]||{};
+    return `<div class="list-item">
+      ${d.image?`<img class="li-thumb" src="${d.image}">`:`<div class="li-icon">${e.icon}</div>`}
+      <div class="li-info"><strong>${e.name}</strong><span>${d.achievement||'(chưa có ảnh)'}</span></div>
+      <div class="li-actions"><button class="btn btn-save btn-sm" onclick="openEduDet('${e.id}','${e.name}')">✏️ Sửa</button></div>
+    </div>`;
+  }).join('');
+}
+function openEduDet(id,name) {
+  const d=eduDetails[id]||{};
+  document.getElementById('eduDetId').value=id;
+  document.getElementById('eduDetTitle').textContent='Chi tiết: '+name;
+  document.getElementById('eduDetAchieve').value=d.achievement||'';
+  document.getElementById('eduDetLink').value=d.link||'';
+  eduDetUp.reset(); if(d.image) eduDetUp.setUrl(d.image);
+  document.getElementById('eduDetModal').classList.add('open');
+}
+document.getElementById('eduDetCancel').addEventListener('click',()=>document.getElementById('eduDetModal').classList.remove('open'));
+document.getElementById('eduDetModal').addEventListener('click',e=>{ if(e.target.id==='eduDetModal') document.getElementById('eduDetModal').classList.remove('open'); });
+document.getElementById('eduDetSave').addEventListener('click', async()=>{
+  const id=document.getElementById('eduDetId').value;
+  const btn=document.getElementById('eduDetSave'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    let img=(eduDetails[id]||{}).image||'';
+    const file=eduDetUp.getFile();
+    if(file) img=await uploadFile(file,'edu/'+id+'.'+file.name.split('.').pop());
+    eduDetails[id]={ image:img, achievement:document.getElementById('eduDetAchieve').value.trim(), link:document.getElementById('eduDetLink').value.trim() };
+    await dbSet('ntt_edu_details',eduDetails);
+    document.getElementById('eduDetModal').classList.remove('open');
+    loadEduDetails(); toast('✅ Đã lưu!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='💾 Lưu'; btn.disabled=false;
+});
+
+/* ═══════════════════════════════ PROJECTS ═══════════════════════════════ */
+let projects=[]; let editProjId=null;
+const projUp=makeUp('projImgArea','projImgPrev','projImgHint','projImgFile');
+
+async function loadProjects() {
+  projects=await dbGet('ntt_projects')||[]; renderProjects();
+}
+function renderProjects() {
+  const el=document.getElementById('projList');
+  if(!projects.length){ el.innerHTML='<div class="empty-msg">Chưa có dự án nào. Nhấn "+ Thêm dự án mới" để bắt đầu.</div>'; return; }
+  el.innerHTML=`<div class="proj-grid">${projects.map((p,i)=>`
+    <div class="proj-card">
+      <div class="proj-card-img">
+        ${p.image?`<img src="${p.image}" alt="${esc(p.title)}">`:`<div class="proj-card-placeholder">🚀</div>`}
+        <div class="proj-card-overlay">
+          <button class="btn btn-save btn-sm" onclick="openProjModal('${p.id}')">✏️ Sửa</button>
+          <button class="btn btn-del btn-sm" onclick="delProj('${p.id}')">🗑️ Xóa</button>
+        </div>
+        <span class="proj-order">#${i+1}</span>
+      </div>
+      <div class="proj-card-body">
+        <div class="proj-card-title">${esc(p.title||'Untitled')}</div>
+        <div class="proj-card-desc">${esc(p.desc||'')}</div>
+        <div class="proj-card-tags">${(p.tags||[]).map(t=>`<span class="proj-tag">${esc(t)}</span>`).join('')}</div>
+        ${p.link?`<a class="proj-link" href="${esc(p.link)}" target="_blank">🔗 ${esc(p.link.replace(/^https?:\/\//,'').split('/')[0])}</a>`:''}
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+document.getElementById('addProjBtn').addEventListener('click',()=>openProjModal(null));
+function openProjModal(id) {
+  editProjId=id; const p=id?projects.find(x=>x.id===id):null;
+  document.getElementById('projModalTitle').textContent=id?'Sửa dự án':'Thêm dự án mới';
+  document.getElementById('projEditId').value=id||'';
+  document.getElementById('projTitle').value=p?.title||'';
+  document.getElementById('projDesc').value=p?.desc||'';
+  document.getElementById('projTags').value=(p?.tags||[]).join(', ');
+  document.getElementById('projLink').value=p?.link||'';
+  projUp.reset(); if(p?.image) projUp.setUrl(p.image);
+  document.getElementById('projModal').classList.add('open');
+}
+document.getElementById('projCancelBtn').addEventListener('click',()=>document.getElementById('projModal').classList.remove('open'));
+document.getElementById('projModal').addEventListener('click',e=>{ if(e.target.id==='projModal') document.getElementById('projModal').classList.remove('open'); });
+document.getElementById('projSaveBtn').addEventListener('click', async()=>{
+  const btn=document.getElementById('projSaveBtn'); btn.textContent='⏳'; btn.disabled=true;
+  try {
+    const id=editProjId||('proj-'+Date.now());
+    let img=editProjId?(projects.find(x=>x.id===editProjId)?.image||''):'';
+    const file=projUp.getFile(); if(file) img=await uploadFile(file,'projects/'+id+'.'+file.name.split('.').pop());
+    const proj={ id, title:document.getElementById('projTitle').value.trim(), desc:document.getElementById('projDesc').value.trim(),
+      tags:document.getElementById('projTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+      link:document.getElementById('projLink').value.trim(), image:img };
+    if(editProjId){ const i=projects.findIndex(x=>x.id===editProjId); projects[i]=proj; } else projects.push(proj);
+    await dbSet('ntt_projects',projects);
+    document.getElementById('projModal').classList.remove('open');
+    renderProjects(); toast('✅ Đã lưu dự án!');
+  } catch(e){ toast('Lỗi: '+e.message,true); }
+  btn.textContent='💾 Lưu'; btn.disabled=false;
+});
+async function delProj(id) {
+  if(!confirm('Xóa dự án?')) return;
+  projects=projects.filter(p=>p.id!==id); await dbSet('ntt_projects',projects); renderProjects(); toast('Đã xóa');
+}
+
+/* ═══════════════════════════════ MUSIC ═══════════════════════════════ */
+let playlist=[];
+async function loadMusic() {
+  playlist=await dbGet('ntt_playlist')||[]; renderMusic();
+}
+function renderMusic() {
+  const el=document.getElementById('musicList');
+  if(!playlist.length){ el.innerHTML='<div class="empty-msg">Playlist trống</div>'; return; }
+  el.innerHTML=playlist.map((t,i)=>`<div class="list-item">
+    <div class="li-icon">🎵</div>
+    <div class="li-info"><strong>${esc(t.title||t.src)}</strong><span>music/${esc(t.src)}</span></div>
+    <div class="li-actions"><button class="btn btn-del btn-sm" onclick="delTrack(${i})">🗑️</button></div>
+  </div>`).join('');
+}
+document.getElementById('addMusicBtn').addEventListener('click', async()=>{
+  const title=document.getElementById('musicTitle').value.trim();
+  const src=document.getElementById('musicSrc').value.trim();
+  if(!src){ toast('Nhập tên file MP3',true); return; }
+  playlist.push({ title:title||src, src });
+  await dbSet('ntt_playlist',playlist);
+  document.getElementById('musicTitle').value=''; document.getElementById('musicSrc').value='';
+  renderMusic(); toast('✅ Đã thêm bài hát!');
+});
+async function delTrack(i) {
+  playlist.splice(i,1); await dbSet('ntt_playlist',playlist); renderMusic(); toast('Đã xóa');
+}
+
+/* ═══════════════════════════════ SETTINGS ═══════════════════════════════ */
+const SECTION_LABELS = {
+  about:   '📋 Giới thiệu (About)',
+  edu:     '🎓 Học vấn',
+  skills:  '💡 Kỹ năng',
+  exp:     '💼 Kinh nghiệm',
+  certs:   '🏆 Bằng cấp',
+  acts:    '🌱 Hoạt động',
+  projects:'🚀 Dự án',
+  contact: '📞 Liên hệ',
+};
+
+async function loadSettings() {
+  const hidden = await dbGet('ntt_hidden') || {};
+  const el=document.getElementById('sectionToggles');
+  el.innerHTML = Object.entries(SECTION_LABELS).map(([key,label])=>{
+    const isHidden = !!hidden['section-'+key];
+    return `<div class="toggle-row">
+      <span>${label}</span>
+      <label class="toggle">
+        <input type="checkbox" data-section="${key}" ${isHidden?'':'checked'} onchange="toggleSection('${key}',this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>`;
+  }).join('');
+}
+
+async function toggleSection(key, visible) {
+  const hidden = await dbGet('ntt_hidden') || {};
+  if(visible) delete hidden['section-'+key];
+  else hidden['section-'+key] = true;
+  await dbSet('ntt_hidden', hidden);
+  toast(visible ? '✅ Đã hiện section' : 'Section đã ẩn');
+}
+
+/* ═══════════════════════════════ SEED DATA ═══════════════════════════════ */
+const SEED = {
+  'ntt_content': {
+    heroName:'Trung', heroTitle:'IT Consultant & Freelancer',
+    heroTagline:'Bridging Technology and Business across Vietnam, Korea, and beyond.',
+    about:'I am an IT consultant and freelancer with a strong foundation in Information Technology and Business Management. With a Bachelor\'s in Information Systems (IUH) and an MBA from Soongsil University graduating with GPA 4.3, I bridge the gap between technical execution and strategic business goals. Holding TOPIK Level 4 and fluent in Vietnamese, English, and Korean, I bring a multicultural perspective to every project.'
+  },
+  'ntt_sec_st': [
+    {id:'st-s1',name:'Python',level:85,icon:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg'},
+    {id:'st-s2',name:'SQL / MS SQL Server',level:88,icon:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/microsoftsqlserver/microsoftsqlserver-plain.svg'},
+    {id:'st-s3',name:'HTML5 / CSS3 / PHP',level:82,icon:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg'},
+    {id:'st-s4',name:'JavaScript',level:75,icon:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg'},
+    {id:'st-s5',name:'DBMS',level:80,icon:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg'},
+    {id:'st-s6',name:'IoT',level:70,icon:'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/arduino/arduino-original.svg'}
+  ],
+  'ntt_sec_sb': [
+    {id:'sb-s1',name:'Microsoft Excel',level:93,icon:'https://img.icons8.com/fluency/48/microsoft-excel-2019.png'},
+    {id:'sb-s2',name:'Microsoft PowerPoint',level:91,icon:'https://img.icons8.com/fluency/48/microsoft-powerpoint-2019.png'},
+    {id:'sb-s3',name:'SNS Marketing / Data Analysis',level:85,icon:'https://cdn.simpleicons.org/googleanalytics/E37400'},
+    {id:'sb-s4',name:'KO–VI–EN Translation',level:88,icon:'🌐'},
+    {id:'sb-s5',name:'AI Tools & Prompt Engineering',level:80,icon:'🤖'}
+  ],
+  'ntt_sec_exp': [
+    {id:'exp-s1',period:'2020.08 — 2022.01',icon:'💼',title:'Freelancer',org:'트레져헌터 · Treasure Hunter',
+     desc:'Managed Vietnamese YouTube channels for Korean companies targeting the Vietnamese market.\nPlanned content and supported marketing campaigns for the Vietnamese audience.\nProvided Korean–Vietnamese business communication and translation services.\nAnalyzed SNS data to propose operational improvements and growth strategies.',
+     tags:'YouTube, Content Marketing, KO–VI Translation, SNS Analysis'},
+    {id:'exp-s2',period:'2021.09 — 2021.12',icon:'🖥️',title:'IT Intern',org:'TOP APEC Co., Ltd.',
+     desc:'Operated and managed platform software systems, including documentation.\nSupported internal communication and administrative tasks across departments.\nAssisted with data organization and preparation of reporting materials.',
+     tags:'Platform Software, Data Management, IT Support'}
+  ],
+  'ntt_sec_act': [
+    {id:'act-s1',icon:'🎨',period:'2025.06.30 — Present',title:'Memory Game Coloring Volunteer',org:'Spring Shine (스프링샤인)',
+     desc:'Ongoing volunteer activity supporting creative coloring and memory game programs.',status:'Ongoing'},
+    {id:'act-s2',icon:'🍚',period:'2025.04 — 2025.06',title:'Senior Dining Hall Volunteer',org:'Sadang Senior Welfare Center',
+     desc:'Volunteered at a senior community dining hall, supporting meal services for elderly residents.',status:'Completed'},
+    {id:'act-s3',icon:'🧸',period:'2025.08.28 — 2025.09.11',title:'Toy & Book Sanitation Assistant',org:'Seoul Metropolitan Childcare Support Center · Seoul Toy Library',
+     desc:'Assisted with hygiene management and cleaning of toys and books at the Seoul Toy Library.',status:'Completed'}
+  ],
+  'ntt_sec_contact': [
+    {id:'cc-gmail',  icon:'https://cdn.simpleicons.org/gmail/EA4335',    label:'Gmail',    value:'ntantrung595@gmail.com', href:'mailto:ntantrung595@gmail.com'},
+    {id:'cc-naver',  icon:'https://cdn.simpleicons.org/naver/03C75A',    label:'Naver',    value:'ntantrung595@naver.com', href:'mailto:ntantrung595@naver.com'},
+    {id:'cc-phone',  icon:'📞',                                           label:'Phone',    value:'010-5085-2245',          href:'tel:01050852245'},
+    {id:'cc-ig',     icon:'https://cdn.simpleicons.org/instagram/E4405F',label:'Instagram',value:'@seungho.fm',            href:'https://www.instagram.com/seungho.fm'},
+    {id:'cc-github', icon:'https://cdn.simpleicons.org/github/ffffff',   label:'GitHub',   value:'Tantrung595',            href:'https://github.com/Tantrung595'},
+    {id:'cc-tiktok', icon:'https://cdn.simpleicons.org/tiktok/ffffff',   label:'TikTok',   value:'@andrew19196',           href:'https://www.tiktok.com/@andrew19196'}
+  ],
+  'ntt_sec_about': [
+    {id:'about-s1',icon:'🎓',title:'MBA · GPA 4.3',          sub:'Soongsil University, Seoul'},
+    {id:'about-s2',icon:'🏆',title:'TOPIK Level 4 · AI Expert Lv.1',sub:'4 Professional Certifications'},
+    {id:'about-s3',icon:'🌏',title:'Trilingual Professional', sub:'Vietnamese · English · Korean (TOPIK 4)'}
+  ],
+  'ntt_playlist': [
+    {title:'Heading Home',src:'heading-home.mp3'}
+  ],
+  'ntt_hidden': {}
+};
+
+const SEED_VER = '6';
+
+/* runSeed:
+   - force=false (autoSeed): chỉ ghi key đang null/thiếu, giữ nguyên dữ liệu người dùng
+   - force=true (nút thủ công): ghi đè toàn bộ (có xác nhận trước khi gọi)
+*/
+async function runSeed(silent=false, force=false) {
+  const btn=document.getElementById('seedBtn');
+  const status=document.getElementById('seedStatus');
+  if(!silent){ btn.disabled=true; btn.textContent='⏳ Đang import...'; status.textContent=''; }
+  try {
+    for(const [key,val] of Object.entries(SEED)) {
+      try {
+        if(!force) {
+          // Chỉ ghi nếu key chưa tồn tại hoặc là mảng/object rỗng
+          const existing = await dbGet(key);
+          const isEmpty = existing === null ||
+            (Array.isArray(existing) && existing.length === 0) ||
+            (existing && typeof existing === 'object' && !Array.isArray(existing) && Object.keys(existing).length === 0);
+          if(!isEmpty) continue;
+        }
+        await dbSet(key, val);
+        if(!silent) status.textContent='Đang lưu '+key+'...';
+      } catch(keyErr) {
+        console.error('[admin] runSeed lỗi key='+key+':', keyErr.message||keyErr);
+        // tiếp tục với key tiếp theo, không dừng toàn bộ seed
+      }
+    }
+    await sb.from('portfolio_data').upsert(
+      {key:'ntt_seed_ver',value:SEED_VER,updated_at:new Date().toISOString()},{onConflict:'key'}
+    );
+    localStorage.removeItem('ntt_sb_ts');
+    localStorage.removeItem('ntt_sb_ver');
+    if(!silent){
+      btn.textContent='✅ Hoàn tất!';
+      status.textContent='Đã import xong.';
+      loadAll(); // manual seed: reload luôn
+    }
+    // autoSeed (silent): loadAll() do showDash() gọi sau await autoSeed()
+  } catch(e) {
+    if(!silent) toast('Lỗi: '+e.message, true);
+    if(!silent){ btn.textContent='🔄 Import dữ liệu từ portfolio'; btn.disabled=false; }
+  }
+}
+
+async function forceSync() {
+  const btn = document.getElementById('forceSyncBtn');
+  const statusEl = document.getElementById('forceSyncStatus');
+  btn.disabled = true; btn.textContent = '⏳ Đang cập nhật...';
+  try {
+    await sb.from('portfolio_data').upsert(
+      { key: '__version', value: Date.now().toString(), updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+    localStorage.removeItem('ntt_sb_ts');
+    localStorage.removeItem('ntt_sb_ver');
+    statusEl.textContent = '✅ Đã xong! Mở lại trang Portfolio để thấy thay đổi.';
+  } catch(e) {
+    statusEl.textContent = '❌ Lỗi: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '🔄 Cập nhật ngay';
+}
+
+async function autoSeed() {
+  const statusEl = document.getElementById('autoSeedStatus');
+  const seedBtn  = document.getElementById('seedBtn');
+  try {
+    const {data, error} = await sb.from('portfolio_data').select('value').eq('key','ntt_seed_ver');
+    if (error) throw error;
+    const ver = data && data[0] ? data[0].value : null;
+    if(ver !== SEED_VER) {
+      // Version chưa khớp: fill các key còn thiếu (không ghi đè dữ liệu người dùng)
+      if(statusEl) statusEl.textContent = '⏳ Đang đồng bộ dữ liệu (v'+SEED_VER+')...';
+      await runSeed(true, false);
+      if(statusEl) statusEl.innerHTML = '✅ Đã đồng bộ lên phiên bản <b>v'+SEED_VER+'</b>';
+    } else {
+      if(statusEl) statusEl.innerHTML = '✅ Dữ liệu đồng bộ <b>v'+SEED_VER+'</b>';
+    }
+    // loadAll() được gọi bởi showDash() SAU KHI autoSeed() hoàn thành
+  } catch(e) {
+    console.warn('[admin] autoSeed error:', e);
+    if(statusEl) statusEl.textContent = '⚠️ Không thể kiểm tra Supabase. Hãy kiểm tra kết nối.';
+    if(seedBtn) seedBtn.style.display = '';
+  }
+}
+
+document.getElementById('seedBtn').addEventListener('click', async()=>{
+  if(!confirm('⚠️ Thao tác này sẽ GHI ĐÈ toàn bộ dữ liệu hiện có bằng dữ liệu mặc định. Bạn chắc chắn không?')) return;
+  document.getElementById('seedBtn').style.display='none';
+  await runSeed(false, true); // force=true → ghi đè tất cả
+});
+
+/* ── Khi index.html lưu dữ liệu lên Supabase → ntt_sb_ts bị xóa → admin tự reload dữ liệu ── */
+window.addEventListener('storage', function(e) {
+  if (e.key === 'ntt_sb_ts' && (e.newValue === null || e.newValue === '')) {
+    if (sessionStorage.getItem('ntt_admin') === '1') {
+      setTimeout(loadAll, 600); // chờ 600ms để Supabase kịp ghi xong
+      toast('🔄 Dữ liệu từ Portfolio đã được cập nhật');
+    }
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof -ti:8080)",
+      "Bash(open \"http://localhost:8080/admin.html\")",
+      "Bash(open \"http://localhost:8080/index.html\")"
+    ]
+  }
+}
