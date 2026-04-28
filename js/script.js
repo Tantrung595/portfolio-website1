@@ -2746,15 +2746,32 @@ var SectionAdmin = (function () {
     if (!valid) { showToast('⚠ Please fill in all fields correctly.', '#fbbf24'); return; }
 
     submitBtn.disabled = true;
-    var subject = encodeURIComponent('Portfolio Contact: ' + name);
-    var body    = encodeURIComponent('From: ' + name + '\nEmail: ' + email + '\n\n' + msg);
-    window.location.href = 'mailto:ntantrung595@gmail.com?subject=' + subject + '&body=' + body;
-
-    setTimeout(function() {
-      form.reset();
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'd6ee91f7-9fdb-45fc-9d45-8f5a037cf48e',
+        name: name,
+        email: email,
+        message: msg,
+        subject: 'Portfolio Contact: ' + name
+      })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.success) {
+        form.reset();
+        showToast('✓ Message sent!', '#34d399');
+      } else {
+        showToast('⚠ Failed to send. Try again.', '#fbbf24');
+      }
+    })
+    .catch(function() {
+      showToast('⚠ Network error. Try again.', '#fbbf24');
+    })
+    .finally(function() {
       submitBtn.disabled = false;
-      showToast('✓ Message sent!', '#34d399');
-    }, 1000);
+    });
   });
 })();
 
