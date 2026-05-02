@@ -7,10 +7,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=28">
+  <link rel="stylesheet" href="css/style.css?v=29">
 </head>
 <body>
 
+  <!-- Scroll Progress -->
+  <div id="scroll-progress"></div>
+  <!-- Custom Cursor -->
+  <div id="cur-dot"></div>
+  <div id="cur-ring"></div>
   <!-- Particle Canvas -->
   <canvas id="particles"></canvas>
   <!-- Cursor glow -->
@@ -92,6 +97,9 @@
 
   <!-- ============ HERO ============ -->
   <section id="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
     <div class="hero-inner">
       <div class="hero-photo-wrap">
         <div class="photo-ring"></div>
@@ -1156,6 +1164,6 @@
       if (cfg) window._sb = window.supabase.createClient(cfg.url, cfg.key);
     })();
   </script>
-  <script src="js/script.js?v=38"></script>
+  <script src="js/script.js?v=39"></script>
 </body>
 </html>

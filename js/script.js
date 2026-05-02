@@ -2869,3 +2869,90 @@ window.addEventListener('scroll', () => {
       });
   });
 })();
+
+/* ============================================
+   SCROLL PROGRESS BAR
+============================================ */
+(function() {
+  var bar = document.getElementById('scroll-progress');
+  if (!bar) return;
+  window.addEventListener('scroll', function() {
+    var doc = document.documentElement;
+    var pct = (doc.scrollTop / (doc.scrollHeight - doc.clientHeight)) * 100;
+    bar.style.width = Math.min(pct, 100) + '%';
+  }, { passive: true });
+})();
+
+/* ============================================
+   CUSTOM CURSOR
+============================================ */
+(function() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+  var dot  = document.getElementById('cur-dot');
+  var ring = document.getElementById('cur-ring');
+  if (!dot || !ring) return;
+  var mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left = mx + 'px';
+    dot.style.top  = my + 'px';
+  }, { passive: true });
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+  document.querySelectorAll('a, button, [role="button"], label, input, textarea, select').forEach(function(el) {
+    el.addEventListener('mouseenter', function() { document.body.classList.add('cursor-hover'); });
+    el.addEventListener('mouseleave', function() { document.body.classList.remove('cursor-hover'); });
+  });
+})();
+
+/* ============================================
+   NUMBER COUNTER ANIMATION
+============================================ */
+(function() {
+  var nums = document.querySelectorAll('.stat-num[data-target]');
+  if (!nums.length) return;
+  var done = false;
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function runCounters() {
+    if (done) return;
+    done = true;
+    nums.forEach(function(el) {
+      var target = parseInt(el.dataset.target, 10);
+      var hasSuffix = el.dataset.target === '43';
+      var start = Date.now();
+      var dur = 1600;
+      (function tick() {
+        var t = Math.min((Date.now() - start) / dur, 1);
+        el.textContent = Math.round(easeOut(t) * target) + (hasSuffix ? '+' : '');
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = target + (hasSuffix ? '+' : '');
+      })();
+    });
+  }
+  window.addEventListener('scroll', runCounters, { once: true, passive: true });
+  setTimeout(runCounters, 1200);
+})();
+
+/* ============================================
+   MAGNETIC BUTTONS
+============================================ */
+(function() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+  document.querySelectorAll('.btn-primary, .cf-submit').forEach(function(btn) {
+    btn.style.transition = 'transform 0.3s cubic-bezier(0.23,1,0.32,1), background 0.2s, box-shadow 0.2s';
+    btn.addEventListener('mousemove', function(e) {
+      var r = btn.getBoundingClientRect();
+      var x = (e.clientX - r.left - r.width / 2) * 0.22;
+      var y = (e.clientY - r.top  - r.height / 2) * 0.22;
+      btn.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(1.03)';
+    });
+    btn.addEventListener('mouseleave', function() {
+      btn.style.transform = 'translate(0,0) scale(1)';
+    });
+  });
+})();

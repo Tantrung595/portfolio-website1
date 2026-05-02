@@ -3565,3 +3565,152 @@ body.admin-edit [data-ck]:hover {
 
 .admin-music-btn { background: rgba(56,189,248,0.1); color: var(--a1); border-color: rgba(56,189,248,0.25); }
 .admin-music-btn:hover { background: rgba(56,189,248,0.2); }
+
+/* ==========================================
+   SCROLL PROGRESS BAR
+========================================== */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+  z-index: 9999;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(56,189,248,0.6);
+}
+
+/* ==========================================
+   CUSTOM CURSOR
+========================================== */
+@media (pointer: fine) {
+  body { cursor: none; }
+  a, button, [role="button"], label[for], input, textarea, select { cursor: none; }
+}
+#cur-dot {
+  position: fixed;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #38bdf8;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%,-50%);
+  transition: transform 0.08s, width 0.2s, height 0.2s, opacity 0.2s;
+  mix-blend-mode: screen;
+}
+#cur-ring {
+  position: fixed;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(56,189,248,0.5);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+}
+body.cursor-hover #cur-dot { width: 12px; height: 12px; background: #818cf8; }
+body.cursor-hover #cur-ring { width: 42px; height: 42px; border-color: rgba(129,140,248,0.6); }
+
+/* ==========================================
+   NOISE TEXTURE OVERLAY
+========================================== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+/* ==========================================
+   HERO GRADIENT ORBS
+========================================== */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  animation: orbFloat 8s ease-in-out infinite alternate;
+}
+.hero-orb-1 { width: 500px; height: 500px; background: rgba(56,189,248,0.07); top: -100px; right: -80px; animation-duration: 9s; }
+.hero-orb-2 { width: 380px; height: 380px; background: rgba(139,92,246,0.06); bottom: -60px; left: -60px; animation-duration: 11s; animation-delay: -3s; }
+.hero-orb-3 { width: 260px; height: 260px; background: rgba(52,211,153,0.05); top: 40%; left: 35%; animation-duration: 7s; animation-delay: -5s; }
+@keyframes orbFloat {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(-30px) scale(1.05); }
+}
+
+/* ==========================================
+   SECTION NUMBER GRADIENT
+========================================== */
+.section-num {
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==========================================
+   STAGGERED CARD REVEAL
+========================================== */
+.exp-card.reveal:nth-child(2),
+.cert-card.reveal:nth-child(2),
+.act-item.reveal:nth-child(2),
+.edu-card.reveal:nth-child(2) { transition-delay: 80ms; }
+.exp-card.reveal:nth-child(3),
+.cert-card.reveal:nth-child(3),
+.act-item.reveal:nth-child(3),
+.edu-card.reveal:nth-child(3) { transition-delay: 160ms; }
+.exp-card.reveal:nth-child(4),
+.cert-card.reveal:nth-child(4),
+.act-item.reveal:nth-child(4),
+.edu-card.reveal:nth-child(4) { transition-delay: 240ms; }
+
+/* ==========================================
+   CARD BORDER GLOW HOVER
+========================================== */
+.exp-card { transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
+.exp-card:hover {
+  box-shadow: 0 0 0 1px rgba(56,189,248,0.25), 0 12px 40px rgba(56,189,248,0.1), 0 2px 8px rgba(0,0,0,0.4);
+  border-color: rgba(56,189,248,0.2);
+}
+.cert-card { transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
+.cert-card:hover {
+  box-shadow: 0 0 0 1px rgba(129,140,248,0.25), 0 12px 40px rgba(129,140,248,0.1), 0 2px 8px rgba(0,0,0,0.4);
+  border-color: rgba(129,140,248,0.2);
+}
+
+/* ==========================================
+   GLASSMORPHISM NAVBAR ENHANCE
+========================================== */
+#navbar {
+  background: rgba(4,4,10,0.3);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+#navbar.scrolled {
+  background: rgba(4,4,10,0.75);
+  border-bottom-color: rgba(56,189,248,0.08);
+}
+
+/* ==========================================
+   HERO STAT COUNTER
+========================================== */
+.stat-num {
+  display: inline-block;
+  transition: transform 0.1s;
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+@media (prefers-reduced-motion: reduce) {
+  .hero-orb, .hero-orb-1, .hero-orb-2, .hero-orb-3 { animation: none; }
+  #scroll-progress { transition: none; }
+  .exp-card.reveal:nth-child(n), .cert-card.reveal:nth-child(n),
+  .act-item.reveal:nth-child(n), .edu-card.reveal:nth-child(n) { transition-delay: 0ms; }
+}
