@@ -2871,6 +2871,56 @@ window.addEventListener('scroll', () => {
 })();
 
 /* ============================================
+   PAGE LOADER
+============================================ */
+(function() {
+  var loader = document.getElementById('page-loader');
+  if (!loader) return;
+  function hide() { loader.classList.add('hidden'); }
+  if (document.readyState === 'complete') {
+    setTimeout(hide, 1500);
+  } else {
+    window.addEventListener('load', function() { setTimeout(hide, 1500); });
+  }
+})();
+
+/* ============================================
+   BACK TO TOP
+============================================ */
+(function() {
+  var btn = document.getElementById('back-top');
+  if (!btn) return;
+  window.addEventListener('scroll', function() {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+  btn.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+/* ============================================
+   ACTIVE NAV LINK
+============================================ */
+(function() {
+  var links = document.querySelectorAll('.nav-links a[href^="#"]');
+  var secs  = Array.from(links).map(function(a) {
+    return document.getElementById(a.getAttribute('href').slice(1));
+  });
+  function update() {
+    var mid = window.scrollY + window.innerHeight * 0.4;
+    var cur = -1;
+    secs.forEach(function(s, i) {
+      if (s && s.offsetTop <= mid) cur = i;
+    });
+    links.forEach(function(a, i) {
+      a.classList.toggle('nav-active', i === cur);
+    });
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+/* ============================================
    SCROLL PROGRESS BAR
 ============================================ */
 (function() {
