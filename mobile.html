@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
-  /* Send phone-sized screens to the dedicated mobile layout, unless
-     the visitor explicitly chose to stay on the desktop page. */
+  /* Send desktop-sized screens back to the desktop page, unless the
+     visitor explicitly chose to stay on the mobile layout. */
   (function () {
     try {
       var pref = localStorage.getItem('ntt_view_pref');
-      var isPhoneSize = window.matchMedia('(max-width: 899px)').matches;
-      if (pref !== 'desktop' && isPhoneSize) {
-        location.replace('mobile.html' + location.search + location.hash);
+      var isDesktopSize = window.matchMedia('(min-width: 900px)').matches;
+      if (pref !== 'mobile' && isDesktopSize) {
+        location.replace('index.html' + location.search + location.hash);
       }
     } catch (e) {}
   })();
@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=34">
+  <link rel="stylesheet" href="css/mobile.css?v=1">
 </head>
 <body>
 
@@ -898,8 +898,8 @@
         </div>
         <p data-en="© 2025 Nguyen Tan Trung. All rights reserved." data-kr="© 2025 응우옌 탄 쭝. 모든 권리 보유.">© 2025 Nguyen Tan Trung. All rights reserved.</p>
         <div class="footer-langs">🇻🇳 🇰🇷 🌐</div>
-        <a href="mobile.html" style="font-size:0.75rem;color:var(--txt2);text-decoration:underline;margin-top:0.6rem;display:inline-block"
-           onclick="try{localStorage.setItem('ntt_view_pref','mobile')}catch(e){}">Xem bản Mobile</a>
+        <a href="index.html" style="font-size:0.75rem;color:var(--txt2);text-decoration:underline;margin-top:0.6rem;display:inline-block"
+           onclick="try{localStorage.setItem('ntt_view_pref','desktop')}catch(e){}">Xem bản Desktop</a>
       </div>
     </div>
   </footer>
