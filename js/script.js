@@ -783,9 +783,32 @@ const Slideshow = (function () {
     return photos[((currentIndex + offset) % n + n) % n];
   }
 
+  let recoveryAttempted = false;
+
+  function pruneBroken(src) {
+    const before = photos.length;
+    photos = photos.filter(p => p !== src);
+    if (photos.length === before) return;
+    if (photos.length === 0) {
+      if (recoveryAttempted) return;
+      recoveryAttempted = true;
+      photos = [...defaults];
+    }
+    currentIndex = 0;
+    savePhotos();
+    renderSlots();
+  }
+
   function setImg(img, src) {
-    if (src) { img.src = src; img.style.opacity = '1'; }
-    else      { img.src = ''; img.style.opacity = '0'; }
+    img.onerror = null;
+    if (src) {
+      img.src = src;
+      img.style.opacity = '1';
+      img.onerror = () => pruneBroken(src);
+    } else {
+      img.src = '';
+      img.style.opacity = '0';
+    }
   }
 
   function renderSlots() {
