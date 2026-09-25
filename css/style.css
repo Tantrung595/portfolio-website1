@@ -1572,6 +1572,10 @@ section {
 /* mobile: stack vertically */
 @media (max-width: 767px) {
   .certs-grid { flex-wrap: wrap; }
+  .cert-card:not(.cc-expanded):not(.cc-shrunken) {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
   .cert-card.cc-expanded {
     flex: 1 1 100% !important;
     flex-direction: column !important;
@@ -2514,7 +2518,14 @@ body.admin-edit [data-ck]:hover {
   .hero-cta { justify-content: center; }
   .hero-desc { margin: 0 auto 1.5rem; }
   .hero-pills { justify-content: center; }
-  .hero-stats { justify-content: center; }
+  .hero-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 1.2rem;
+  }
+  .stat { align-items: center; }
+  .stat-divider { display: none; }
+  .scroll-hint { display: none; }
 
   .hero-photo-wrap,
   .hero-photo {
